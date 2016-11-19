@@ -52,6 +52,12 @@
 			*/
 		}
 
+		function draw() {
+			context.globalAlpha = 1;
+			context.restore();
+			for ()
+		}
+
 		window.addEventListener('load', setup, false);
 
 	</script>
