@@ -3,3 +3,12 @@
 	Camden I. Wagner
 	11/17/2016
 */
+
+body {
+	height: 100%;
+	margin: 5px;
+}
+
+#frame {
+	align-items: center;
+}
