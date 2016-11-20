@@ -18,7 +18,12 @@
 	
 	<script type="text/javascript">
 
-		var player_location = {x:500,y:500};
+		var MAP = {_0:new Image()};
+
+		MAP._0.src = "./img/map/map_0.png";
+
+		var map_size = {x:1100,y:1100};
+		var player_location = {x:550,y:550};
 
 		var game = new Game();
 		console.log(game);
@@ -55,7 +60,16 @@
 		function draw() {
 			context.globalAlpha = 1;
 			context.restore();
-			for ()
+			var x = player_location.x-450;
+			var y = player_location.y-450;
+			console.log(x+","+y);
+			var mod_x = x%100;
+			var mod_y = y%100;
+			for (var i = 0; i < 9; i++) {
+				for (var j = 0; j < 9; j++) {
+					
+				}
+			}
 		}
 
 		window.addEventListener('load', setup, false);
