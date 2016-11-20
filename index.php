@@ -23,6 +23,7 @@
 		MAP._0.src = "./img/map/map_0.png";
 
 		var map_size = {x:1100,y:1100};
+		var map_origin = {x:100,y:100};
 		var player_location = {x:550,y:550};
 
 		var game = new Game();
@@ -60,14 +61,19 @@
 		function draw() {
 			context.globalAlpha = 1;
 			context.restore();
-			var x = player_location.x-450;
-			var y = player_location.y-450;
-			console.log(x+","+y);
-			var mod_x = x%100;
-			var mod_y = y%100;
-			for (var i = 0; i < 9; i++) {
-				for (var j = 0; j < 9; j++) {
-					
+			/*for loop to draw the map*/
+			for (var i = parseInt(map_origin.x/100); i < parseInt((map_origin.x/100)+10); i++) {
+				for (var j = parseInt(map_origin.y/100); j < parseInt((map_origin.y/100)+10); j++) {
+					var image = null;
+					/*setting image to the proper map image from game.map*/
+					switch(game.map[i][j]) {
+						case 0: image = MAP._0;break;
+						default:break;
+					}
+					/*calculating coordinates to draw the img to based on the map_origin*/
+					var draw_x = (i*100)-(map_origin.x);
+					var draw_y = (j*100)-(map_origin.y);
+					context.drawImage(image,draw_x,draw_y);
 				}
 			}
 		}

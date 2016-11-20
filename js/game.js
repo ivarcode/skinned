@@ -11,5 +11,5 @@ function Game() {
 			this.map[i][j] = 0;
 		}
 	}
-	this.map[3][4] = 1;
+	// this.map[3][4] = 1;
 }
