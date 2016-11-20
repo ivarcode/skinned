@@ -19,8 +19,11 @@
 	<script type="text/javascript">
 
 		var MAP = {_0:new Image()};
+		var CHAR = {_player:new Image()};
 
 		MAP._0.src = "./img/map/map_0.png";
+
+		CHAR._player.src = "./img/player.png";
 
 		var map_size = {x:1100,y:1100};
 		var map_origin = {x:100,y:100};
@@ -76,6 +79,8 @@
 					context.drawImage(image,draw_x,draw_y);
 				}
 			}
+			/*draws player in at player_location*/
+			context.drawImage(CHAR._player,player_location.x-(map_origin.x+30),player_location.y-(map_origin.y+30));
 		}
 
 		window.addEventListener('load', setup, false);
