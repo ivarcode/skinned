@@ -135,33 +135,40 @@
 		/*function responsible for setting the game clock after each tick*/
 		function setClock() {
 			var today = new Date();
-			// console.log(today);
+			// a is the total milliseconds of the current day time
 			var a = today.getHours()*3600000;
 			a += today.getMinutes()*60000;
 			a += today.getSeconds()*1000;
 			a += today.getMilliseconds();
+			// b is the total milliseconds of the GAME_START_TIME
 			var b = GAME_START_TIME.getHours()*3600000;
 			b += GAME_START_TIME.getMinutes()*60000;
 			b += GAME_START_TIME.getSeconds()*1000;
 			b += GAME_START_TIME.getMilliseconds();
+			// c is the difference
 			c = a-b;
+			// if c is negative, add total milliseconds in 24hrs
 			if (c < 0) {
 				c += 86400000;
 			}
+			// parsing the data to display by h, m, s, and ms
 			var h = parseInt(c/3600000);
 			var m = parseInt((c%3600000)/60000);
 			var s = parseInt(((c%3600000)%60000)/1000);
 			var ms = ((c%3600000)%60000)%1000;
 			var time = "";
 			time += h+":";
+			// adding a 0 if m < 10
 			if (m < 10) {
 				time += "0";
 			}
 			time += m+":";
+			// adding a 0 if s < 10
 			if (s < 10) {
 				time += "0";
 			}
 			time += s+":";
+			// adding one 0 if ms < 10, two if ms < 100
 			if (ms < 100) {
 				time += "0";
 			}
