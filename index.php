@@ -18,10 +18,14 @@
 	
 	<script type="text/javascript">
 
+		/*CONSTANTS*/
+		var GAME_START_TIME = null;
+
+		/*DATA*/
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
 		var PLAYER_STATS = {_SPEED:5};
-		var GAME_STATS = {_SPEED:10};
+		var GAME_STATS = {_SPEED:10,_CLOCK:null};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false};
 
 		MAP._0.src = "./img/map/map_0.png";
@@ -89,7 +93,8 @@
 			});
 
 			// start timing function at end of setup
-			console.log("Game begins now.")
+			GAME_START_TIME = new Date();
+			console.log("Game begins "+GAME_START_TIME+".");
 			tick();
 		}
 
@@ -97,6 +102,7 @@
 		function tick() {
 			// console.log("tick");
 			movePlayer();
+			setClock();
 
 			draw();
 			var t = setTimeout(tick,GAME_STATS._SPEED);
@@ -126,6 +132,44 @@
 			}
 		}
 
+		/*function responsible for setting the game clock after each tick*/
+		function setClock() {
+			var today = new Date();
+			// console.log(today);
+			var a = today.getHours()*3600000;
+			a += today.getMinutes()*60000;
+			a += today.getSeconds()*1000;
+			a += today.getMilliseconds();
+			var b = GAME_START_TIME.getHours()*3600000;
+			b += GAME_START_TIME.getMinutes()*60000;
+			b += GAME_START_TIME.getSeconds()*1000;
+			b += GAME_START_TIME.getMilliseconds();
+			c = a-b;
+			var h = parseInt(c/3600000);
+			var m = parseInt((c%3600000)/60000);
+			var s = parseInt(((c%3600000)%60000)/1000);
+			var ms = ((c%3600000)%60000)%1000;
+			var time = "";
+			time += h+":";
+			if (m < 10) {
+				time += "0";
+			}
+			time += m+":";
+			if (s < 10) {
+				time += "0";
+			}
+			time += s+":";
+			if (ms < 100) {
+				time += "0";
+			}
+			if (ms < 10) {
+				time += "0";
+			}
+			time += ms;
+			GAME_STATS._CLOCK = time;
+		}
+
+		/*function responsible for drawing the game after each tick*/
 		function draw() {
 			context.globalAlpha = 1;
 			context.restore();
@@ -146,6 +190,10 @@
 			}
 			/*draws player in at player_location*/
 			context.drawImage(CHAR._player,player_location.x-(map_origin.x+30),player_location.y-(map_origin.y+30));
+			/*drawing clock*/
+			context.fillStyle = "#FFFFFF";
+			context.font = "20px lucida console";
+			context.fillText(GAME_STATS._CLOCK,730,50);
 		}
 
 		window.addEventListener('load', setup, false);
