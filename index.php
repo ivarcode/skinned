@@ -20,6 +20,9 @@
 
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
+		var PLAYER_STATS = {_SPEED:5};
+		var GAME_STATS = {_SPEED:10};
+		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false};
 
 		MAP._0.src = "./img/map/map_0.png";
 
@@ -42,23 +45,85 @@
 
 			draw();
 
-			/*
-			game_canvas.addEventListener('mousedown',function(events){
-				
+			/*GAME CONTROLS
+			window eventlisteners for keydown and keyup*/
+			window.addEventListener("keydown",function(events) {
+				var keycode = events.keyCode;
+				// console.log(keycode);
+				/*KEYPRESSED == 'W'*/
+				if (keycode == 87) {
+					KEY_DATA._w_IS_PRESSED = true;
+				}
+				/*KEYPRESSED == 'A'*/
+				if (keycode == 65) {
+					KEY_DATA._a_IS_PRESSED = true;
+				}
+				/*KEYPRESSED == 'S'*/
+				if (keycode == 83) {
+					KEY_DATA._s_IS_PRESSED = true;
+				}
+				/*KEYPRESSED == 'D'*/
+				if (keycode == 68) {
+					KEY_DATA._d_IS_PRESSED = true;
+				}
 			});
-			game_canvas.addEventListener('mouseup',function(events){
+			window.addEventListener("keyup",function(events) {
+				var keycode = events.keyCode;
+				// console.log(keycode);
+				/*KEYPRESSED == 'W'*/
+				if (keycode == 87) {
+					KEY_DATA._w_IS_PRESSED = false;
+				}
+				/*KEYPRESSED == 'A'*/
+				if (keycode == 65) {
+					KEY_DATA._a_IS_PRESSED = false;
+				}
+				/*KEYPRESSED == 'S'*/
+				if (keycode == 83) {
+					KEY_DATA._s_IS_PRESSED = false;
+				}
+				/*KEYPRESSED == 'D'*/
+				if (keycode == 68) {
+					KEY_DATA._d_IS_PRESSED = false;
+				}
+			});
 
-			});
-			game_canvas.addEventListener('mouseenter',function(events){
+			// start timing function at end of setup
+			console.log("Game begins now.")
+			tick();
+		}
 
-			});
-			game_canvas.addEventListener('mouseleave',function(events){
-				
-			});
-			game_canvas.addEventListener('mousemove',function(events){
-				
-			});
-			*/
+		/*timing function*/
+		function tick() {
+			// console.log("tick");
+			movePlayer();
+
+			draw();
+			var t = setTimeout(tick,GAME_STATS._SPEED);
+		}
+
+		/*function responsible for manipulating the player*/
+		function movePlayer() {
+			/*if 'W' key is down*/
+			if (KEY_DATA._w_IS_PRESSED) {
+				// move player "up"
+				player_location.y = player_location.y-PLAYER_STATS._SPEED;
+			}
+			/*if 'A' key is down*/
+			if (KEY_DATA._a_IS_PRESSED) {
+				// move player "left"
+				player_location.x = player_location.x-PLAYER_STATS._SPEED;
+			}
+			/*if 'S' key is down*/
+			if (KEY_DATA._s_IS_PRESSED) {
+				// move player "down"
+				player_location.y = player_location.y+PLAYER_STATS._SPEED;
+			}
+			/*if 'D' key is down*/
+			if (KEY_DATA._d_IS_PRESSED) {
+				// move player "right"
+				player_location.x = player_location.x+PLAYER_STATS._SPEED;
+			}
 		}
 
 		function draw() {
