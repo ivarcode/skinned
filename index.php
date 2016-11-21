@@ -145,6 +145,9 @@
 			b += GAME_START_TIME.getSeconds()*1000;
 			b += GAME_START_TIME.getMilliseconds();
 			c = a-b;
+			if (c < 0) {
+				c += 86400000;
+			}
 			var h = parseInt(c/3600000);
 			var m = parseInt((c%3600000)/60000);
 			var s = parseInt(((c%3600000)%60000)/1000);
