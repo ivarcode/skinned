@@ -24,7 +24,27 @@ function Chunk(coord) {
 /*helper functions*/
 function add_chunk(game,chunk) {
 	// function responsible for adding a chunk to the game
-	
+	var north_chunk = game.get_chunk({x:chunk.coordinates.x,y:chunk.coordinates.y-1});
+	var south_chunk = game.get_chunk({x:chunk.coordinates.x,y:chunk.coordinates.y+1});
+	var west_chunk = game.get_chunk({x:chunk.coordinates.x-1,y:chunk.coordinates.y});
+	var east_chunk = game.get_chunk({x:chunk.coordinates.x+1,y:chunk.coordinates.y});
+	if (north_chunk != null) {
+		north_chunk.neighbors._S = chunk;
+		chunk.neighbors._N = north_chunk;
+	}
+	if (south_chunk != null) {
+		south_chunk.neighbors._N = chunk;
+		chunk.neighbors._S = south_chunk;
+	}
+	if (west_chunk != null) {
+		west_chunk.neighbors._E = chunk;
+		chunk.neighbors._W = west_chunk;
+	}
+	if (east_chunk != null) {
+		east_chunk.neighbors._W = chunk;
+		chunk.neighbors._E = east_chunk;
+	}
+	game.chunks[game.chunks.length]	= chunk;
 }
 
 /*Game prototype functions*/
