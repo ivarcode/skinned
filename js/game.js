@@ -4,12 +4,36 @@ game.js
 
 /*Game object constructor*/
 function Game() {
-	this.map = [11];
+	this.chunks = [];
+	this.chunks[0] = new Chunk({x:0,y:0});
+}
+
+/*Chunk object constructor*/
+function Chunk(coord) {
+	this.coordinates = coord;
+	this.data = [];
 	for (var i = 0; i < 11; i++) {
-		this.map[i] = [];
+		this.data[i] = [];
 		for (var j = 0; j < 11; j++) {
-			this.map[i][j] = 0;
+			this.data[i][j] = 0;
 		}
 	}
-	// this.map[3][4] = 1;
+	this.neighbors = {_N:null,_S:null,_E:null,_W:null};
 }
+
+/*helper functions*/
+function add_chunk(game,chunk) {
+	// function responsible for adding a chunk to the game
+	
+}
+
+/*Game prototype functions*/
+Game.prototype.get_chunk = function(coord) {
+	// returns chunk at coord in game, if no chunk exists, returns null
+	for (var i = 0; i < this.chunks.length; i++) {
+		if (this.chunks[i].coordinates.x == coord.x && this.chunks[i].coordinates.y == coord.y) {
+			return this.chunks[i];
+		}
+	}
+	return null;
+};

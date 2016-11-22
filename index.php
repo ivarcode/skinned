@@ -28,15 +28,20 @@
 		var GAME_STATS = {_SPEED:10,_CLOCK:null};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false};
 
+		/*MAP IMGS*/
 		MAP._0.src = "./img/map/map_0.png";
 
+		/*CHAR IMGS*/
 		CHAR._player.src = "./img/player.png";
 
-		var map_size = {x:1100,y:1100};
-		var map_origin = {x:100,y:100};
+		/*LOCATION DATA*/
+		var current_chunk = null;
+		var camera_origin = {x:100,y:100};
 		var player_location = {x:550,y:550};
 
 		var game = new Game();
+		current_chunk = game.src_chunk;
+		add_chunk(game,new Chunk({x:0,y:1}));
 		console.log(game);
 
 		function setup() {
@@ -184,22 +189,22 @@
 			context.globalAlpha = 1;
 			context.restore();
 			/*for loop to draw the map*/
-			for (var i = parseInt(map_origin.x/100); i < parseInt((map_origin.x/100)+10); i++) {
-				for (var j = parseInt(map_origin.y/100); j < parseInt((map_origin.y/100)+10); j++) {
+			for (var i = parseInt(camera_origin.x/100); i < parseInt((camera_origin.x/100)+10); i++) {
+				for (var j = parseInt(camera_origin.y/100); j < parseInt((camera_origin.y/100)+10); j++) {
 					var image = null;
 					/*setting image to the proper map image from game.map*/
 					switch(game.map[i][j]) {
 						case 0: image = MAP._0;break;
 						default:break;
 					}
-					/*calculating coordinates to draw the img to based on the map_origin*/
-					var draw_x = (i*100)-(map_origin.x);
-					var draw_y = (j*100)-(map_origin.y);
+					/*calculating coordinates to draw the img to based on the camera_origin*/
+					var draw_x = (i*100)-(camera_origin.x);
+					var draw_y = (j*100)-(camera_origin.y);
 					context.drawImage(image,draw_x,draw_y);
 				}
 			}
 			/*draws player in at player_location*/
-			context.drawImage(CHAR._player,player_location.x-(map_origin.x+30),player_location.y-(map_origin.y+30));
+			context.drawImage(CHAR._player,player_location.x-(camera_origin.x+30),player_location.y-(camera_origin.y+30));
 			/*drawing clock*/
 			context.fillStyle = "#FFFFFF";
 			context.font = "20px lucida console";
