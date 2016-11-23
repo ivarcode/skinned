@@ -36,12 +36,14 @@
 
 		/*LOCATION DATA*/
 		var current_chunk = null;
-		var camera_origin = {x:100,y:100};
+		var camera_origin = {x:400,y:400};
 		var player_location = {x:550,y:550};
 
 		var game = new Game();
-		current_chunk = game.src_chunk;
+		current_chunk = game.chunks[0];
 		add_chunk(game,new Chunk({x:0,y:1}));
+		add_chunk(game,new Chunk({x:1,y:0}));
+		add_chunk(game,new Chunk({x:1,y:1}));
 		console.log(game);
 
 		function setup() {
@@ -192,14 +194,29 @@
 			for (var i = parseInt(camera_origin.x/100); i < parseInt((camera_origin.x/100)+10); i++) {
 				for (var j = parseInt(camera_origin.y/100); j < parseInt((camera_origin.y/100)+10); j++) {
 					var image = null;
+					var MAP_ID = null;
+					// setting the MAP_ID temp var for use in img selection
+					if (i < 11 && j < 11) {
+						MAP_ID = current_chunk.data[i][j];
+					} else {
+						if (i < 11) {
+							MAP_ID = current_chunk.neighbors._S.data[i][j-11];
+						} else if (j < 11) {
+							MAP_ID = current_chunk.neighbors._E.data[i-11][j];
+						} else {
+							MAP_ID = current_chunk.neighbors._S.neighbors._E.data[i-11][j-11];
+						}
+					}
 					/*setting image to the proper map image from game.map*/
-					switch(game.map[i][j]) {
+					switch(MAP_ID) {
 						case 0: image = MAP._0;break;
 						default:break;
 					}
 					/*calculating coordinates to draw the img to based on the camera_origin*/
 					var draw_x = (i*100)-(camera_origin.x);
 					var draw_y = (j*100)-(camera_origin.y);
+					// console.log(draw_x+" "+draw_y);
+					// console.log(image);
 					context.drawImage(image,draw_x,draw_y);
 				}
 			}
