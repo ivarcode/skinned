@@ -169,6 +169,18 @@
 				// move player "right"
 				player_location.x = player_location.x+PLAYER_STATS._SPEED;
 			}
+			if (player_location.x >= 1100) {
+				player_location.x -= 1100;
+			}
+			if (player_location.x < 0) {
+				player_location.x += 1100;
+			}
+			if (player_location.y >= 1100) {
+				player_location.y -= 1100;
+			}
+			if (player_location.y < 0) {
+				player_location.y += 1100;
+			}
 		}
 
 		/*function responsible for adjusting the camera when the player is out of range*/
@@ -195,6 +207,14 @@
 			if (canv_loc.y < player_min) {
 				var diff = canv_loc.y-player_min;
 				camera_origin.y = camera_origin.y + diff;
+			}
+			if (camera_origin.x >= 1100) {
+				camera_origin.x -= 1100;
+				current_chunk = current_chunk.neighbors._E;
+			}
+			if (camera_origin.x < 0) {
+				camera_origin.x += 1100;
+				current_chunk = current_chunk.neighbors._W;
 			}
 		}
 
@@ -272,7 +292,7 @@
 						}
 					}
 					/*setting image to the proper map image from game.map*/
-					switch(MAP_ID) {
+					switch (MAP_ID) {
 						case 0: image = MAP._0;break;
 						default:break;
 					}
