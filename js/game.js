@@ -47,6 +47,11 @@ function add_chunk(game,chunk) {
 	game.chunks[game.chunks.length]	= chunk;
 }
 
+function print_coordinates(element) {
+	// prints coordinates of the element input to the console
+	console.log(element.x+","+element.y);
+}
+
 /*Game prototype functions*/
 Game.prototype.get_chunk = function(coord) {
 	// returns chunk at coord in game, if no chunk exists, returns null

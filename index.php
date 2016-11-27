@@ -36,14 +36,11 @@
 
 		/*LOCATION DATA*/
 		var current_chunk = null;
-		var camera_origin = {x:400,y:400};
+		var camera_origin = {x:100,y:100};
 		var player_location = {x:550,y:550};
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
-		add_chunk(game,new Chunk({x:0,y:1}));
-		add_chunk(game,new Chunk({x:1,y:0}));
-		add_chunk(game,new Chunk({x:1,y:1}));
 		console.log(game);
 
 		function setup() {
@@ -109,10 +106,19 @@
 		function tick() {
 			// console.log("tick");
 			movePlayer();
+			setCamera();
 			setClock();
+			generateNecessaryChunks();
+			print_coordinates(player_location);
 
 			draw();
 			var t = setTimeout(tick,GAME_STATS._SPEED);
+		}
+
+		/*function responsible for generating the chunks adj to current_chunk if they do not already exist*/
+		function generateNecessaryChunks() {
+			// this function generates all chunks within one x and y coordinate away, so all 8 'squares' around the current_chunk
+
 		}
 
 		/*function responsible for manipulating the player*/
@@ -136,6 +142,33 @@
 			if (KEY_DATA._d_IS_PRESSED) {
 				// move player "right"
 				player_location.x = player_location.x+PLAYER_STATS._SPEED;
+			}
+		}
+
+		/*function responsible for adjusting the camera when the player is out of range*/
+		function setCamera() {
+			// print_coordinates(player_location);
+			// print_coordinates(camera_origin);
+			var player_max = 700;
+			var player_min = 200;
+			// canv_loc is the distance from the corner of the canvas that the player is being drawn
+			var canv_loc = {x:player_location.x-camera_origin.x,y:player_location.y-camera_origin.y};
+			// conditions regarding player location being close to the edge
+			if (canv_loc.x > player_max) {
+				var diff = canv_loc.x-player_max;
+				camera_origin.x = camera_origin.x + diff;
+			}
+			if (canv_loc.x < player_min) {
+				var diff = canv_loc.x-player_min;
+				camera_origin.x = camera_origin.x + diff;
+			}
+			if (canv_loc.y > player_max) {
+				var diff = canv_loc.y-player_max;
+				camera_origin.y = camera_origin.y + diff;
+			}
+			if (canv_loc.y < player_min) {
+				var diff = canv_loc.y-player_min;
+				camera_origin.y = camera_origin.y + diff;
 			}
 		}
 
@@ -194,17 +227,22 @@
 			for (var i = parseInt(camera_origin.x/100); i < parseInt((camera_origin.x/100)+10); i++) {
 				for (var j = parseInt(camera_origin.y/100); j < parseInt((camera_origin.y/100)+10); j++) {
 					var image = null;
+					var coordinates = null;
 					var MAP_ID = null;
 					// setting the MAP_ID temp var for use in img selection
 					if (i < 11 && j < 11) {
 						MAP_ID = current_chunk.data[i][j];
+						coordinates = current_chunk.coordinates.x+","+current_chunk.coordinates.y;
 					} else {
 						if (i < 11) {
 							MAP_ID = current_chunk.neighbors._S.data[i][j-11];
+							coordinates = current_chunk.neighbors._S.coordinates.x+","+current_chunk.neighbors._S.coordinates.y;
 						} else if (j < 11) {
 							MAP_ID = current_chunk.neighbors._E.data[i-11][j];
+							coordinates = current_chunk.neighbors._E.coordinates.x+","+current_chunk.neighbors._E.coordinates.y;
 						} else {
 							MAP_ID = current_chunk.neighbors._S.neighbors._E.data[i-11][j-11];
+							coordinates = current_chunk.neighbors._S.neighbors._E.coordinates.x+","+current_chunk.neighbors._S.neighbors._E.coordinates.y;
 						}
 					}
 					/*setting image to the proper map image from game.map*/
@@ -218,6 +256,8 @@
 					// console.log(draw_x+" "+draw_y);
 					// console.log(image);
 					context.drawImage(image,draw_x,draw_y);
+					// draw coordinates (used for debugging only)
+					context.fillText(coordinates,draw_x+35,draw_y+60);
 				}
 			}
 			/*draws player in at player_location*/
