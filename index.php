@@ -109,7 +109,8 @@
 			setCamera();
 			setClock();
 			generateNecessaryChunks();
-			print_coordinates(player_location);
+
+			// print_coordinates(player_location);
 
 			draw();
 			var t = setTimeout(tick,GAME_STATS._SPEED);
@@ -118,7 +119,32 @@
 		/*function responsible for generating the chunks adj to current_chunk if they do not already exist*/
 		function generateNecessaryChunks() {
 			// this function generates all chunks within one x and y coordinate away, so all 8 'squares' around the current_chunk
-
+			var coord = current_chunk.coordinates;
+			// print_coordinates(coord);
+			if (current_chunk.neighbors._N == null) {
+				add_chunk(game,new Chunk({x:coord.x,y:coord.y-1}));
+			}
+			if (current_chunk.neighbors._S == null) {
+				add_chunk(game,new Chunk({x:coord.x,y:coord.y+1}));
+			}
+			if (current_chunk.neighbors._W == null) {
+				add_chunk(game,new Chunk({x:coord.x-1,y:coord.y}));
+			}
+			if (current_chunk.neighbors._E == null) {
+				add_chunk(game,new Chunk({x:coord.x+1,y:coord.y}));
+			}
+			if (current_chunk.neighbors._N.neighbors._E == null) {
+				add_chunk(game,new Chunk({x:coord.x+1,y:coord.y-1}));
+			}
+			if (current_chunk.neighbors._N.neighbors._W == null) {
+				add_chunk(game,new Chunk({x:coord.x-1,y:coord.y-1}));
+			}
+			if (current_chunk.neighbors._S.neighbors._E == null) {
+				add_chunk(game,new Chunk({x:coord.x+1,y:coord.y+1}));
+			}
+			if (current_chunk.neighbors._S.neighbors._W == null) {
+				add_chunk(game,new Chunk({x:coord.x-1,y:coord.y+1}));
+			}
 		}
 
 		/*function responsible for manipulating the player*/
@@ -148,7 +174,7 @@
 		/*function responsible for adjusting the camera when the player is out of range*/
 		function setCamera() {
 			// print_coordinates(player_location);
-			// print_coordinates(camera_origin);
+			print_coordinates(camera_origin);
 			var player_max = 700;
 			var player_min = 200;
 			// canv_loc is the distance from the corner of the canvas that the player is being drawn
@@ -261,6 +287,7 @@
 				}
 			}
 			/*draws player in at player_location*/
+			// print_coordinates(player_location);
 			context.drawImage(CHAR._player,player_location.x-(camera_origin.x+30),player_location.y-(camera_origin.y+30));
 			/*drawing clock*/
 			context.fillStyle = "#FFFFFF";
