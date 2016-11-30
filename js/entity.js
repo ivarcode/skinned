@@ -26,7 +26,16 @@ Entity.prototype.move_south = function(dist) {
 	this.coordinates = {x:this.coordinates.x,y:this.coordinates.y+dist};
 };
 
+/*getters*/
 Entity.prototype.get_speed = function() {
 	// returns speed entity
 	return this.speed;
+};
+Entity.prototype.get_X = function() {
+	// returns x value of this.coordinates
+	return this.coordinates.x;
+};
+Entity.prototype.get_Y = function() {
+	// returns y value of this.coordinates
+	return this.coordinates.y;
 };

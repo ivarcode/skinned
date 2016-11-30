@@ -37,11 +37,13 @@
 
 		/*LOCATION DATA*/
 		var current_chunk = null;
-		var camera_origin = {x:550,y:100};
+		var camera_chunk = null;
+		var camera_origin = {x:100,y:100};
 		var player = new Entity({x:550,y:550},5);
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
+		camera_chunk = current_chunk;
 		current_chunk.add_entity(player);
 		console.log(game);
 
@@ -151,6 +153,7 @@
 
 		/*function responsible for manipulating the player*/
 		function movePlayer() {
+			// movement control
 			/*if 'W' key is down*/
 			if (KEY_DATA._w_IS_PRESSED) {
 				// move player "up"
@@ -170,6 +173,35 @@
 			if (KEY_DATA._d_IS_PRESSED) {
 				// move player "right"
 				player.move_east(player.get_speed());
+			}
+			// chunk switching when necessary
+			if (player.get_X() < 0) {
+				// switch to west chunk, move player object to proper chunk, and set coordinate properly
+				current_chunk.remove_entity(player);
+				current_chunk = current_chunk.neighbors._W;
+				current_chunk.add_entity(player);
+				player.coordinates.x = player.get_X()+1100;
+			}
+			if (player.get_X() >= 1100) {
+				// switch to east chunk, move player object to proper chunk, and set coordinate properly
+				current_chunk.remove_entity(player);
+				current_chunk = current_chunk.neighbors._E;
+				current_chunk.add_entity(player);
+				player.coordinates.x = player.get_X()-1100;
+			}
+			if (player.get_Y() < 0) {
+				// switch to north chunk, move player object to proper chunk, and set coordinate properly
+				current_chunk.remove_entity(player);
+				current_chunk = current_chunk.neighbors._N;
+				current_chunk.add_entity(player);
+				player.coordinates.y = player.get_Y()+1100;
+			}
+			if (player.get_Y() >= 1100) {
+				// switch to south chunk, move player object to proper chunk, and set coordinate properly
+				current_chunk.remove_entity(player);
+				current_chunk = current_chunk.neighbors._S;
+				current_chunk.add_entity(player);
+				player.coordinates.y = player.get_Y()-1100;
 			}
 		}
 
