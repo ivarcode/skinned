@@ -15,6 +15,8 @@
 	<link rel="stylesheet" href="style.css">
 
 	<script type="text/javascript" src="./js/game.js"></script>
+	<script type="text/javascript" src="./js/chunk.js"></script>
+	<script type="text/javascript" src="./js/entity.js"></script>
 	
 	<script type="text/javascript">
 
@@ -24,7 +26,6 @@
 		/*DATA*/
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
-		var PLAYER_STATS = {_SPEED:5};
 		var GAME_STATS = {_SPEED:10,_CLOCK:null};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false};
 
@@ -37,10 +38,11 @@
 		/*LOCATION DATA*/
 		var current_chunk = null;
 		var camera_origin = {x:550,y:100};
-		var player_location = {x:550,y:550};
+		var player = new Entity({x:550,y:550},5);
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
+		current_chunk.add_entity(player);
 		console.log(game);
 
 		function setup() {
@@ -149,7 +151,26 @@
 
 		/*function responsible for manipulating the player*/
 		function movePlayer() {
-			
+			/*if 'W' key is down*/
+			if (KEY_DATA._w_IS_PRESSED) {
+				// move player "up"
+				player.move_north(player.get_speed());
+			}
+			/*if 'A' key is down*/
+			if (KEY_DATA._a_IS_PRESSED) {
+				// move player "left"
+				player.move_west(player.get_speed());
+			}
+			/*if 'S' key is down*/
+			if (KEY_DATA._s_IS_PRESSED) {
+				// move player "down"
+				player.move_south(player.get_speed());
+			}
+			/*if 'D' key is down*/
+			if (KEY_DATA._d_IS_PRESSED) {
+				// move player "right"
+				player.move_east(player.get_speed());
+			}
 		}
 
 		/*function responsible for adjusting the camera when the player is out of range*/

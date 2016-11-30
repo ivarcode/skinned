@@ -8,19 +8,6 @@ function Game() {
 	this.chunks[0] = new Chunk({x:0,y:0});
 }
 
-/*Chunk object constructor*/
-function Chunk(coord) {
-	this.coordinates = coord;
-	this.data = [];
-	for (var i = 0; i < 11; i++) {
-		this.data[i] = [];
-		for (var j = 0; j < 11; j++) {
-			this.data[i][j] = 0;
-		}
-	}
-	this.neighbors = {_N:null,_S:null,_E:null,_W:null};
-}
-
 /*helper functions*/
 function add_chunk(game,chunk) {
 	// function responsible for adding a chunk to the game
