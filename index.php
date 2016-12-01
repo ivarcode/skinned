@@ -207,7 +207,59 @@
 
 		/*function responsible for adjusting the camera when the player is out of range*/
 		function setCamera() {
-			
+			// checking X lower bound
+			var temp = player.get_X()-camera_origin.x;
+			if (temp < 0) {
+				if (temp+1100 < 200) {
+					camera_origin = {x:camera_origin.x-(200-(temp+1100)),y:camera_origin.y};
+				}
+			} else if (temp < 200) {
+				camera_origin = {x:camera_origin.x-(200-temp),y:camera_origin.y};
+			}
+			// checking X upper bound
+			temp = player.get_X()-camera_origin.x;
+			if (temp < 0) {
+				if (temp+1100 >= 900) {
+					camera_origin = {x:camera_origin.x+((temp+1100)-900),y:camera_origin.y};
+				}
+			} else if (temp >= 900) {
+				camera_origin = {x:camera_origin.x+(temp-900),y:camera_origin.y};
+			}
+			// checking Y lower bound
+			temp = player.get_Y()-camera_origin.y;
+			if (temp < 0) {
+				if (temp+1100 < 200) {
+					camera_origin = {x:camera_origin.x,y:camera_origin.y-(200-(temp+1100))};
+				}
+			} else if (temp < 200) {
+				camera_origin = {x:camera_origin.x,y:camera_origin.y-(200-temp)};
+			}
+			// checking Y upper bound
+			temp = player.get_Y()-camera_origin.y;
+			if (temp < 0) {
+				if (temp+1100 >= 900) {
+					camera_origin = {x:camera_origin.x,y:camera_origin.y+((temp+1100)-900)};
+				}
+			} else if (temp >= 900) {
+				camera_origin = {x:camera_origin.x,y:camera_origin.y+(temp-900)};
+			}
+			// chunk switching when necessary
+			if (camera_origin.x < 0) {
+				camera_chunk = camera_chunk.neighbors._W;
+				camera_origin.x += 1100;
+			}
+			if (camera_origin.x >= 1100) {
+				camera_chunk = camera_chunk.neighbors._E;
+				camera_origin.x -= 1100;
+			}
+			if (camera_origin.y < 0) {
+				camera_chunk = camera_chunk.neighbors._N;
+				camera_origin.y += 1100;
+			}
+			if (camera_origin.y >= 1100) {
+				camera_chunk = camera_chunk.neighbors._S;
+				camera_origin.y -= 1100;
+			}
 		}
 
 		/*function responsible for setting the game clock after each tick*/
@@ -261,7 +313,51 @@
 		function draw() {
 			context.globalAlpha = 1;
 			context.restore();
-			
+			/*for loop to draw the map*/
+			for (var i = parseInt(camera_origin.x/100); i < parseInt((camera_origin.x/100)+10); i++) {
+				for (var j = parseInt(camera_origin.y/100); j < parseInt((camera_origin.y/100)+10); j++) {
+					var image = null;
+					var coordinates = null;
+					var MAP_ID = null;
+					// setting the MAP_ID temp var for use in img selection
+					if (i < 11 && j < 11) {
+						MAP_ID = camera_chunk.data[i][j];
+						coordinates = camera_chunk.coordinates.x+","+camera_chunk.coordinates.y;
+					} else {
+						if (i < 11) {
+							MAP_ID = camera_chunk.neighbors._S.data[i][j-11];
+							coordinates = camera_chunk.neighbors._S.coordinates.x+","+camera_chunk.neighbors._S.coordinates.y;
+						} else if (j < 11) {
+							MAP_ID = camera_chunk.neighbors._E.data[i-11][j];
+							coordinates = camera_chunk.neighbors._E.coordinates.x+","+camera_chunk.neighbors._E.coordinates.y;
+						} else {
+							MAP_ID = camera_chunk.neighbors._S.neighbors._E.data[i-11][j-11];
+							coordinates = camera_chunk.neighbors._S.neighbors._E.coordinates.x+","+camera_chunk.neighbors._S.neighbors._E.coordinates.y;
+						}
+					}
+					/*setting image to the proper map image from game.map*/
+					switch (MAP_ID) {
+						case 0: image = MAP._0;break;
+						default:break;
+					}
+					/*calculating coordinates to draw the img to based on the camera_origin*/
+					var draw_x = (i*100)-(camera_origin.x);
+					var draw_y = (j*100)-(camera_origin.y);
+					// console.log(draw_x+" "+draw_y);
+					// console.log(image);
+					context.drawImage(image,draw_x,draw_y);
+					// draw coordinates (used for debugging only)
+					context.fillText(coordinates,draw_x+35,draw_y+60);
+				}
+			}
+			/*draws player*/
+			// TODO CHANGE TO DRAW ENTITIES
+			context.drawImage(CHAR._player,player.get_X()-(camera_origin.x+30),player.get_Y()-(camera_origin.y+30));
+			/*drawing clock*/
+			context.fillStyle = "#FFFFFF";
+			context.font = "20px lucida console";
+			context.fillText(GAME_STATS._CLOCK,730,50);
+			context.fillText(camera_origin.x+","+camera_origin.y,0,30);
 		}
 
 		window.addEventListener('load', setup, false);
