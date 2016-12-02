@@ -3,9 +3,12 @@ entity.js
 */
 
 /*Entity object constructor*/
-function Entity(coord,speed) {
+function Entity(coord,speed,height,width,img) {
 	this.coordinates = coord;
 	this.speed = speed;
+	this.height = height;
+	this.width = width;
+	this.img = img;
 }
 
 /*Entity prototype functions*/

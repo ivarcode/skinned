@@ -26,8 +26,8 @@
 		/*DATA*/
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
-		var GAME_STATS = {_SPEED:10,_CLOCK:null};
-		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false};
+		var GAME_STATS = {_SPEED:10,_CLOCK:null,_PAUSED:true};
+		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
 		MAP._0.src = "./img/map/map_0.png";
@@ -39,7 +39,7 @@
 		var current_chunk = null;
 		var camera_chunk = null;
 		var camera_origin = {x:100,y:100};
-		var player = new Entity({x:550,y:550},5);
+		var player = new Entity({x:550,y:550},5,60,60,CHAR._player);
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
@@ -78,6 +78,10 @@
 				if (keycode == 68) {
 					KEY_DATA._d_IS_PRESSED = true;
 				}
+				/*KEYPRESSED == 'P'*/
+				if (keycode == 80) {
+					KEY_DATA._p_IS_PRESSED = true;
+				}
 			});
 			window.addEventListener("keyup",function(events) {
 				var keycode = events.keyCode;
@@ -98,6 +102,10 @@
 				if (keycode == 68) {
 					KEY_DATA._d_IS_PRESSED = false;
 				}
+				/*KEYPRESSED == 'P'*/
+				if (keycode == 80) {
+					KEY_DATA._p_IS_PRESSED = false;
+				}
 			});
 
 			// start timing function at end of setup
@@ -106,7 +114,7 @@
 			tick();
 		}
 
-		/*timing function*/
+		/*timing functions*/
 		function tick() {
 			// console.log("tick");
 			movePlayer();
@@ -117,7 +125,36 @@
 			// print_coordinates(player_location);
 
 			draw();
-			var t = setTimeout(tick,GAME_STATS._SPEED);
+			if (KEY_DATA._p_IS_PRESSED) {
+				if (GAME_STATS._PAUSED) {
+					GAME_STATS._PAUSED = false;
+				} else {
+					GAME_STATS._PAUSED = true;
+				}
+			}
+			if (!GAME_STATS._PAUSED) {
+				console.log("game "+GAME_STATS._PAUSED);
+				setInterval(tick,GAME_STATS._SPEED);
+			} else {
+				console.log("wait "+GAME_STATS._PAUSED);
+				setTimeout(wait,1);
+			}
+		}
+		function wait() {
+			if (KEY_DATA._p_IS_PRESSED) {
+				if (GAME_STATS._PAUSED) {
+					GAME_STATS._PAUSED = false;
+				} else {
+					GAME_STATS._PAUSED = true;
+				}
+			}
+			if (!GAME_STATS._PAUSED) {
+				console.log("game "+GAME_STATS._PAUSED);
+				setInterval(tick,GAME_STATS._SPEED);
+			} else {
+				console.log("wait "+GAME_STATS._PAUSED);
+				setTimeout(wait,1);
+			}
 		}
 
 		/*function responsible for generating the chunks adj to current_chunk if they do not already exist*/
@@ -350,9 +387,30 @@
 					context.fillText(coordinates,draw_x+35,draw_y+60);
 				}
 			}
-			/*draws player*/
-			// TODO CHANGE TO DRAW ENTITIES
-			context.drawImage(CHAR._player,player.get_X()-(camera_origin.x+30),player.get_Y()-(camera_origin.y+30));
+			/*draws entities*/
+			var active_chunks = [];
+			active_chunks[active_chunks] = current_chunk;
+			active_chunks[active_chunks] = current_chunk.neighbors._N;
+			active_chunks[active_chunks] = current_chunk.neighbors._S;
+			active_chunks[active_chunks] = current_chunk.neighbors._W;
+			active_chunks[active_chunks] = current_chunk.neighbors._E;
+			active_chunks[active_chunks] = current_chunk.neighbors._N.neighbors._W;
+			active_chunks[active_chunks] = current_chunk.neighbors._N.neighbors._E;
+			active_chunks[active_chunks] = current_chunk.neighbors._S.neighbors._W;
+			active_chunks[active_chunks] = current_chunk.neighbors._S.neighbors._E;
+			console.log(active_chunks);
+			for (var i = 0; i < active_chunks.length; i++) {
+				if (active_chunks[i].coordinates.x == camera_chunk.coordinates.x && active_chunks[i].coordinates.y == camera_chunk.coordinates.y) {
+					// same chunk as camera chunk, draw without displacing
+					for (var j = 0; j < active_chunks[i].entities.length; j++) {
+						console.log(active_chunks[i]);
+						context.drawImage(active_chunks[i].entities[j].img,active_chunks[i].entities[j].get_X()-(active_chunks[i].entities[j].width/2),active_chunks[i].entities[j].get_Y()-(active_chunks[i].entities[j].height/2));
+					}
+				} else {
+
+				}
+			}
+			// context.drawImage(CHAR._player,player.get_X()-(camera_origin.x+30),player.get_Y()-(camera_origin.y+30));
 			/*drawing clock*/
 			context.fillStyle = "#FFFFFF";
 			context.font = "20px lucida console";
