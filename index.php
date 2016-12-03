@@ -25,7 +25,7 @@
 
 		/*DATA*/
 		var MAP = {_0:new Image()};
-		var CHAR = {_player:new Image()};
+		var CHAR = {_player:new Image(),_enemy:new Image()};
 		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:true};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
@@ -34,6 +34,7 @@
 
 		/*CHAR IMGS*/
 		CHAR._player.src = "./img/player.png";
+		CHAR._enemy.src = "./img/enemy.png";
 
 		/*LOCATION DATA*/
 		var current_chunk = null;
@@ -128,9 +129,12 @@
 				// print_coordinates(current_chunk.coordinates)
 				// print_coordinates(player.coordinates);
 				movePlayer();
+				moveEntities();
 				setCamera();
 				setClock();
 				generateNecessaryChunks();
+				spawnEnemies();
+
 
 				draw();
 			} else {
@@ -223,6 +227,11 @@
 				current_chunk.add_entity(player);
 				player.coordinates.y = player.get_Y()-1100;
 			}
+		}
+
+		/*function responsible for moving entities other than the player*/
+		function moveEntities() {
+			// TODO move other entities that exist in nine active chunks
 		}
 
 		/*function responsible for adjusting the camera when the player is out of range*/
@@ -327,6 +336,29 @@
 			}
 			time += ms;
 			GAME_STATS._CLOCK = time;
+		}
+
+		/*function responsible for creating enemies in the game*/
+		function spawnEnemies() {
+			var neighbor_chunks = [];
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._N;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._S;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._W;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._E;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._N.neighbors._E;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._N.neighbors._W;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._S.neighbors._E;
+			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._S.neighbors._W;
+			// loop through and generate spawns
+			for (var i = 0; i < neighbor_chunks.length; i++) {
+				var rand = Math.floor(Math.random()*20);
+				// console.log(rand);
+				if (rand == 0) {
+					var x = Math.floor(Math.random()*1100);
+					var y = Math.floor(Math.random()*1100);
+					neighbor_chunks[i].entities[neighbor_chunks[i].entities.length] = new Entity({x:x,y:y},3,60,60,CHAR._enemy);
+				}
+			}
 		}
 
 		/*function responsible for drawing the game after each tick*/
