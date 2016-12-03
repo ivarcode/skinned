@@ -135,6 +135,8 @@
 				generateNecessaryChunks();
 
 				draw();
+			} else {
+				// TODO have pause timer run / stop and save the ongoing timer
 			}
 			
 		}
@@ -385,11 +387,19 @@
 				if (active_chunks[i].coordinates.x == camera_chunk.coordinates.x && active_chunks[i].coordinates.y == camera_chunk.coordinates.y) {
 					// same chunk as camera chunk, draw without displacing
 					for (var j = 0; j < active_chunks[i].entities.length; j++) {
-						context.drawImage(active_chunks[i].entities[j].img,active_chunks[i].entities[j].get_X()-((active_chunks[i].entities[j].width/2)+camera_origin.x),active_chunks[i].entities[j].get_Y()-((active_chunks[i].entities[j].height/2)+camera_origin.y));
+						var x = active_chunks[i].entities[j].get_X()-((active_chunks[i].entities[j].width/2)+camera_origin.x);
+						var y = active_chunks[i].entities[j].get_Y()-((active_chunks[i].entities[j].height/2)+camera_origin.y);
+						context.drawImage(active_chunks[i].entities[j].img,x,y);
 					}
 				} else {
 					// different chunk, calculate displacement, then draw
-
+					for (var j = 0; j < active_chunks[i].entities.length; j++) {
+						var x = active_chunks[i].entities[j].get_X()-((active_chunks[i].entities[j].width/2)+camera_origin.x);
+						var y = active_chunks[i].entities[j].get_Y()-((active_chunks[i].entities[j].height/2)+camera_origin.y);
+						x += ((active_chunks[i].coordinates.x-camera_chunk.coordinates.x)*1100);
+						y += ((active_chunks[i].coordinates.y-camera_chunk.coordinates.y)*1100);
+						context.drawImage(active_chunks[i].entities[j].img,x,y);
+					}
 				}
 			}
 			// context.drawImage(CHAR._player,player.get_X()-(camera_origin.x+30),player.get_Y()-(camera_origin.y+30));
