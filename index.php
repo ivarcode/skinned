@@ -55,10 +55,8 @@
     		};
 			context = game_canvas.getContext("2d");
 
-			// draw();
-			context.fillStyle = "#FFFFFF";
-			context.font = "20px lucida console";
-			context.fillText("press 'P' to play / pause",300,500);
+			drawMenu();
+			
 
 			/*GAME CONTROLS
 			window eventlisteners for keydown and keyup*/
@@ -127,8 +125,8 @@
 			// console.log("tock");
 
 			if (!GAME_STATS._PAUSED) {
-				print_coordinates(current_chunk.coordinates)
-				print_coordinates(player.coordinates);
+				// print_coordinates(current_chunk.coordinates)
+				// print_coordinates(player.coordinates);
 				movePlayer();
 				setCamera();
 				setClock();
@@ -137,6 +135,7 @@
 				draw();
 			} else {
 				// TODO have pause timer run / stop and save the ongoing timer
+				drawMenu();
 			}
 			
 		}
@@ -396,6 +395,7 @@
 					for (var j = 0; j < active_chunks[i].entities.length; j++) {
 						var x = active_chunks[i].entities[j].get_X()-((active_chunks[i].entities[j].width/2)+camera_origin.x);
 						var y = active_chunks[i].entities[j].get_Y()-((active_chunks[i].entities[j].height/2)+camera_origin.y);
+						// adjust x and y for chunk difference
 						x += ((active_chunks[i].coordinates.x-camera_chunk.coordinates.x)*1100);
 						y += ((active_chunks[i].coordinates.y-camera_chunk.coordinates.y)*1100);
 						context.drawImage(active_chunks[i].entities[j].img,x,y);
@@ -408,6 +408,13 @@
 			context.font = "20px lucida console";
 			context.fillText(GAME_STATS._CLOCK,730,50);
 			context.fillText(camera_origin.x+","+camera_origin.y,0,30);
+		}
+
+		/*function responsible for drawing the menu when the game is paused*/
+		function drawMenu() {
+			context.fillStyle = "#FFFFFF";
+			context.font = "20px lucida console";
+			context.fillText("press 'P' to play / pause",300,500);
 		}
 
 		window.addEventListener('load', setup, false);
