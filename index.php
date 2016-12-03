@@ -26,7 +26,7 @@
 		/*DATA*/
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
-		var GAME_STATS = {_SPEED:10,_CLOCK:null,_PAUSED:true};
+		var GAME_STATS = {_SPEED:33,_CLOCK:null,_PAUSED:true};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
@@ -81,6 +81,8 @@
 				/*KEYPRESSED == 'P'*/
 				if (keycode == 80) {
 					KEY_DATA._p_IS_PRESSED = true;
+					// pause/unpause
+					GAME_STATS._PAUSED = !GAME_STATS._PAUSED;
 				}
 			});
 			window.addEventListener("keyup",function(events) {
@@ -117,44 +119,42 @@
 		/*timing functions*/
 		function tick() {
 			// console.log("tick");
-			movePlayer();
-			setCamera();
-			setClock();
-			generateNecessaryChunks();
+
+			setTimeout(tick,GAME_STATS._SPEED);
+			// console.log("tock");
+
+			if (!GAME_STATS._PAUSED) {
+				
+				movePlayer();
+				setCamera();
+				setClock();
+				generateNecessaryChunks();
+
+				draw();
+			}
+			
+			// clearInterval(t);
 
 			// print_coordinates(player_location);
 
-			draw();
-			if (KEY_DATA._p_IS_PRESSED) {
-				if (GAME_STATS._PAUSED) {
-					GAME_STATS._PAUSED = false;
-				} else {
-					GAME_STATS._PAUSED = true;
-				}
-			}
-			if (!GAME_STATS._PAUSED) {
-				console.log("game "+GAME_STATS._PAUSED);
-				setInterval(tick,GAME_STATS._SPEED);
-			} else {
-				console.log("wait "+GAME_STATS._PAUSED);
-				setTimeout(wait,1);
-			}
-		}
-		function wait() {
-			if (KEY_DATA._p_IS_PRESSED) {
-				if (GAME_STATS._PAUSED) {
-					GAME_STATS._PAUSED = false;
-				} else {
-					GAME_STATS._PAUSED = true;
-				}
-			}
-			if (!GAME_STATS._PAUSED) {
-				console.log("game "+GAME_STATS._PAUSED);
-				setInterval(tick,GAME_STATS._SPEED);
-			} else {
-				console.log("wait "+GAME_STATS._PAUSED);
-				setTimeout(wait,1);
-			}
+			
+			// if (KEY_DATA._p_IS_PRESSED) {
+			// 	if (GAME_STATS._PAUSED) {
+			// 		console.log("game played");
+			// 		GAME_STATS._PAUSED = false;
+			// 	} else {
+			// 		console.log("game paused");
+			// 		GAME_STATS._PAUSED = true;
+			// 	}
+			// }
+			// if (!GAME_STATS._PAUSED) {
+			// 	console.log("game "+GAME_STATS._PAUSED);
+			// 	setInterval(tick,GAME_STATS._SPEED);
+			// } else {
+			// 	console.log("wait "+GAME_STATS._PAUSED);
+			// 	setInterval(wait,GAME_STATS._SPEED);
+			// }
+			
 		}
 
 		/*function responsible for generating the chunks adj to current_chunk if they do not already exist*/
@@ -389,24 +389,24 @@
 			}
 			/*draws entities*/
 			var active_chunks = [];
-			active_chunks[active_chunks] = current_chunk;
-			active_chunks[active_chunks] = current_chunk.neighbors._N;
-			active_chunks[active_chunks] = current_chunk.neighbors._S;
-			active_chunks[active_chunks] = current_chunk.neighbors._W;
-			active_chunks[active_chunks] = current_chunk.neighbors._E;
-			active_chunks[active_chunks] = current_chunk.neighbors._N.neighbors._W;
-			active_chunks[active_chunks] = current_chunk.neighbors._N.neighbors._E;
-			active_chunks[active_chunks] = current_chunk.neighbors._S.neighbors._W;
-			active_chunks[active_chunks] = current_chunk.neighbors._S.neighbors._E;
-			console.log(active_chunks);
+			active_chunks[active_chunks.length] = current_chunk;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._E;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N.neighbors._E;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S.neighbors._E;
+			// console.log(active_chunks);
 			for (var i = 0; i < active_chunks.length; i++) {
 				if (active_chunks[i].coordinates.x == camera_chunk.coordinates.x && active_chunks[i].coordinates.y == camera_chunk.coordinates.y) {
 					// same chunk as camera chunk, draw without displacing
 					for (var j = 0; j < active_chunks[i].entities.length; j++) {
-						console.log(active_chunks[i]);
 						context.drawImage(active_chunks[i].entities[j].img,active_chunks[i].entities[j].get_X()-(active_chunks[i].entities[j].width/2),active_chunks[i].entities[j].get_Y()-(active_chunks[i].entities[j].height/2));
 					}
 				} else {
+					// different chunk, calculate displacement, then draw
 
 				}
 			}
