@@ -26,7 +26,7 @@
 		/*DATA*/
 		var MAP = {_0:new Image()};
 		var CHAR = {_player:new Image()};
-		var GAME_STATS = {_SPEED:33,_CLOCK:null,_PAUSED:true};
+		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:true};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
@@ -39,7 +39,7 @@
 		var current_chunk = null;
 		var camera_chunk = null;
 		var camera_origin = {x:100,y:100};
-		var player = new Entity({x:550,y:550},5,60,60,CHAR._player);
+		var player = new Entity({x:550,y:550},10,60,60,CHAR._player);
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
@@ -56,6 +56,9 @@
 			context = game_canvas.getContext("2d");
 
 			// draw();
+			context.fillStyle = "#FFFFFF";
+			context.font = "20px lucida console";
+			context.fillText("press 'P' to play / pause",300,500);
 
 			/*GAME CONTROLS
 			window eventlisteners for keydown and keyup*/
@@ -124,7 +127,8 @@
 			// console.log("tock");
 
 			if (!GAME_STATS._PAUSED) {
-				
+				print_coordinates(current_chunk.coordinates)
+				print_coordinates(player.coordinates);
 				movePlayer();
 				setCamera();
 				setClock();
@@ -132,28 +136,6 @@
 
 				draw();
 			}
-			
-			// clearInterval(t);
-
-			// print_coordinates(player_location);
-
-			
-			// if (KEY_DATA._p_IS_PRESSED) {
-			// 	if (GAME_STATS._PAUSED) {
-			// 		console.log("game played");
-			// 		GAME_STATS._PAUSED = false;
-			// 	} else {
-			// 		console.log("game paused");
-			// 		GAME_STATS._PAUSED = true;
-			// 	}
-			// }
-			// if (!GAME_STATS._PAUSED) {
-			// 	console.log("game "+GAME_STATS._PAUSED);
-			// 	setInterval(tick,GAME_STATS._SPEED);
-			// } else {
-			// 	console.log("wait "+GAME_STATS._PAUSED);
-			// 	setInterval(wait,GAME_STATS._SPEED);
-			// }
 			
 		}
 
@@ -256,11 +238,11 @@
 			// checking X upper bound
 			temp = player.get_X()-camera_origin.x;
 			if (temp < 0) {
-				if (temp+1100 >= 900) {
-					camera_origin = {x:camera_origin.x+((temp+1100)-900),y:camera_origin.y};
+				if (temp+1100 >= 700) {
+					camera_origin = {x:camera_origin.x+((temp+1100)-700),y:camera_origin.y};
 				}
-			} else if (temp >= 900) {
-				camera_origin = {x:camera_origin.x+(temp-900),y:camera_origin.y};
+			} else if (temp >= 700) {
+				camera_origin = {x:camera_origin.x+(temp-700),y:camera_origin.y};
 			}
 			// checking Y lower bound
 			temp = player.get_Y()-camera_origin.y;
@@ -274,11 +256,11 @@
 			// checking Y upper bound
 			temp = player.get_Y()-camera_origin.y;
 			if (temp < 0) {
-				if (temp+1100 >= 900) {
-					camera_origin = {x:camera_origin.x,y:camera_origin.y+((temp+1100)-900)};
+				if (temp+1100 >= 700) {
+					camera_origin = {x:camera_origin.x,y:camera_origin.y+((temp+1100)-700)};
 				}
-			} else if (temp >= 900) {
-				camera_origin = {x:camera_origin.x,y:camera_origin.y+(temp-900)};
+			} else if (temp >= 700) {
+				camera_origin = {x:camera_origin.x,y:camera_origin.y+(temp-700)};
 			}
 			// chunk switching when necessary
 			if (camera_origin.x < 0) {
@@ -403,7 +385,7 @@
 				if (active_chunks[i].coordinates.x == camera_chunk.coordinates.x && active_chunks[i].coordinates.y == camera_chunk.coordinates.y) {
 					// same chunk as camera chunk, draw without displacing
 					for (var j = 0; j < active_chunks[i].entities.length; j++) {
-						context.drawImage(active_chunks[i].entities[j].img,active_chunks[i].entities[j].get_X()-(active_chunks[i].entities[j].width/2),active_chunks[i].entities[j].get_Y()-(active_chunks[i].entities[j].height/2));
+						context.drawImage(active_chunks[i].entities[j].img,active_chunks[i].entities[j].get_X()-((active_chunks[i].entities[j].width/2)+camera_origin.x),active_chunks[i].entities[j].get_Y()-((active_chunks[i].entities[j].height/2)+camera_origin.y));
 					}
 				} else {
 					// different chunk, calculate displacement, then draw
