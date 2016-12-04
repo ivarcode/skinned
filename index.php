@@ -40,7 +40,7 @@
 		var current_chunk = null;
 		var camera_chunk = null;
 		var camera_origin = {x:100,y:100};
-		var player = new Entity({x:550,y:550},10,60,60,CHAR._player);
+		var player = new Entity({x:550,y:550},10,100,60,60,CHAR._player,"player");
 
 		var game = new Game();
 		current_chunk = game.chunks[0];
@@ -129,10 +129,10 @@
 				// print_coordinates(current_chunk.coordinates)
 				// print_coordinates(player.coordinates);
 				movePlayer();
-				moveEntities();
+				generateNecessaryChunks();
+				enemyChoices();
 				setCamera();
 				setClock();
-				generateNecessaryChunks();
 				spawnEnemies();
 
 
@@ -142,6 +142,29 @@
 				drawMenu();
 			}
 			
+		}
+
+		/*function responsible for all choices involving enemy AI (moving, shooting, etc) in the surrounding and current chunk (9 total chunks)*/
+		function enemyChoices() {
+			var active_chunks = [];
+			active_chunks[active_chunks.length] = current_chunk;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._E;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._N.neighbors._E;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S.neighbors._W;
+			active_chunks[active_chunks.length] = current_chunk.neighbors._S.neighbors._E;
+			// loop through each chunk
+			for (var i = 0; i < active_chunks.length; i++) {
+				// loop through each entity in chunk
+				for (var j = 0; j < active_chunks[i].entities.length; j++) {
+					if (active_chunks[i].entities[j].type == "enemy") {
+						// TODO
+					}
+				}
+			}
 		}
 
 		/*function responsible for generating the chunks adj to current_chunk if they do not already exist*/
@@ -227,11 +250,6 @@
 				current_chunk.add_entity(player);
 				player.coordinates.y = player.get_Y()-1100;
 			}
-		}
-
-		/*function responsible for moving entities other than the player*/
-		function moveEntities() {
-			// TODO move other entities that exist in nine active chunks
 		}
 
 		/*function responsible for adjusting the camera when the player is out of range*/
@@ -351,12 +369,12 @@
 			neighbor_chunks[neighbor_chunks.length] = current_chunk.neighbors._S.neighbors._W;
 			// loop through and generate spawns
 			for (var i = 0; i < neighbor_chunks.length; i++) {
-				var rand = Math.floor(Math.random()*20);
+				var rand = Math.floor(Math.random()*100);
 				// console.log(rand);
 				if (rand == 0) {
 					var x = Math.floor(Math.random()*1100);
 					var y = Math.floor(Math.random()*1100);
-					neighbor_chunks[i].entities[neighbor_chunks[i].entities.length] = new Entity({x:x,y:y},3,60,60,CHAR._enemy);
+					neighbor_chunks[i].entities[neighbor_chunks[i].entities.length] = new Entity({x:x,y:y},3,20,60,60,CHAR._enemy,"enemy");
 				}
 			}
 		}
@@ -399,7 +417,7 @@
 					// console.log(image);
 					context.drawImage(image,draw_x,draw_y);
 					// draw coordinates (used for debugging only)
-					context.fillText(coordinates,draw_x+35,draw_y+60);
+					// context.fillText(coordinates,draw_x+35,draw_y+60);
 				}
 			}
 			/*draws entities*/
@@ -436,10 +454,13 @@
 			}
 			// context.drawImage(CHAR._player,player.get_X()-(camera_origin.x+30),player.get_Y()-(camera_origin.y+30));
 			/*drawing clock*/
+			context.fillStyle = "#900101";
+			context.fillRect(30,36,player.health_points,15);
 			context.fillStyle = "#FFFFFF";
 			context.font = "20px lucida console";
+			context.fillText(player.health_points+" HP",40+player.health_points,50);
 			context.fillText(GAME_STATS._CLOCK,730,50);
-			context.fillText(camera_origin.x+","+camera_origin.y,0,30);
+			// context.fillText(camera_origin.x+","+camera_origin.y,0,30);
 		}
 
 		/*function responsible for drawing the menu when the game is paused*/
