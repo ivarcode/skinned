@@ -32,3 +32,24 @@ Chunk.prototype.remove_entity = function(entity) {
 		}
 	}
 };
+
+/*helper functions to generate chunk types*/
+function base_chunk(coord) {
+	// base chunk designed to be the players home / safehaven until another base is acquired
+	var chunk = new Chunk(coord);
+	var new_data = [
+	[0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,1,1,1,0,1,1,1,0,0],
+	[0,0,1,0,0,0,0,0,1,0,0],
+	[0,0,1,0,0,0,0,0,1,0,0],
+	[0,0,1,0,0,0,0,0,1,0,0],
+	[0,0,1,0,0,0,0,0,1,0,0],
+	[0,0,1,0,0,0,0,0,1,0,0],
+	[0,0,1,1,1,0,1,1,1,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0]
+	];
+	chunk.data = new_data;
+	return chunk;
+}

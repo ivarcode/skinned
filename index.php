@@ -24,14 +24,15 @@
 		var GAME_START_TIME = null;
 
 		/*DATA*/
-		var MAP = {_0:new Image()};
+		var MAP = {_0:new Image(),_1:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
 		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:true};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
 		MAP._0.src = "./img/map/map_0.png";
-
+		MAP._1.src = "./img/map/map_1.png";
+		
 		/*CHAR IMGS*/
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
@@ -408,6 +409,7 @@
 					/*setting image to the proper map image from game.map*/
 					switch (MAP_ID) {
 						case 0: image = MAP._0;break;
+						case 1: image = MAP._1;break;
 						default:break;
 					}
 					/*calculating coordinates to draw the img to based on the camera_origin*/

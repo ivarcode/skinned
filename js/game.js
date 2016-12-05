@@ -5,7 +5,7 @@ game.js
 /*Game object constructor*/
 function Game() {
 	this.chunks = [];
-	this.chunks[0] = new Chunk({x:0,y:0});
+	this.chunks[0] = base_chunk({x:0,y:0});
 }
 
 /*helper functions*/
