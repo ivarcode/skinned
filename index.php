@@ -26,7 +26,7 @@
 		/*DATA*/
 		var MAP = {_0:new Image(),_1:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
-		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:true};
+		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:false/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
@@ -201,6 +201,8 @@
 
 		/*function responsible for manipulating the player*/
 		function movePlayer() {
+			// storing current player location data
+			var prior_loc = {x:player.get_X(),y:player.get_Y()};
 			// movement control
 			/*if 'W' key is down*/
 			if (KEY_DATA._w_IS_PRESSED) {
@@ -251,6 +253,48 @@
 				current_chunk.add_entity(player);
 				player.coordinates.y = player.get_Y()-1100;
 			}
+			// adjust player for obstacles
+			var resistance_from_N = false;
+			var resistance_from_S = false;
+			var resistance_from_E = false;
+			var resistance_from_W = false;
+			if (player.get_X() > 100-(player.width/2)) {
+
+			} else if (player.get_X() < player.width/2) {
+
+			} else if (player.get_Y() > 100-(player.height/2)) {
+
+			} else if (player.get_Y() < player.height/2) {
+
+			}
+
+
+
+			// var NE_point = {x:player.get_X()+(player.width/2),y:player.get_Y()-(player.height/2)};
+			// var SE_point = {x:player.get_X()+(player.width/2),y:player.get_Y()+(player.height/2)};
+			// var NW_point = {x:player.get_X()-(player.width/2),y:player.get_Y()-(player.height/2)};
+			// var SW_point = {x:player.get_X()-(player.width/2),y:player.get_Y()+(player.height/2)};
+			// if (is_impassable(current_chunk.data[parseInt(NE_point.x/100)][parseInt(NE_point.y/100)])) {
+			// 	var x_overlap = NE_point.x%100;
+			// 	var y_overlap = NE_point.y%100;
+			// 	console.log(x_overlap+" "+y_overlap);
+			// 	if (prior_loc.x != player.get_X() && prior_loc.y != player.get_Y()) {
+			// 		if (x_overlap == 100-y_overlap) {
+			// 			player.move_west(NE_point.x%100);
+			// 			player.move_south(100-NE_point.y%100);
+			// 		}
+			// 		if (x_overlap > 100-y_overlap) {
+			// 			player.move_south(100-NE_point.y%100);
+			// 		} else {
+			// 			player.move_west(NE_point.x%100);
+			// 		}
+			// 	} else if (prior_loc.x != player.get_X()) {
+			// 		player.move_west(NE_point.x%100);
+			// 	} else if (prior_loc.y != player.get_Y()) {
+			// 		player.move_south(100-NE_point.y%100);
+			// 	}
+			// }
+			
 		}
 
 		/*function responsible for adjusting the camera when the player is out of range*/

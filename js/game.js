@@ -34,6 +34,14 @@ function add_chunk(game,chunk) {
 	game.chunks[game.chunks.length]	= chunk;
 }
 
+function is_impassable(data) {
+	// returns if the data reflects an impassable square in the chunk
+	if (data == 1) {
+		return true;
+	}
+	return false;
+}
+
 function print_coordinates(element) {
 	// prints coordinates of the element input to the console
 	console.log(element.x+","+element.y);
