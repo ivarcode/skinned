@@ -258,14 +258,46 @@
 			var resistance_from_S = false;
 			var resistance_from_E = false;
 			var resistance_from_W = false;
-			if (player.get_X() > 100-(player.width/2)) {
+			if (player.get_X()%100 > 100-(player.width/2)) {
+				if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)+1][parseInt(player.get_Y()/100)])) {
+					resistance_from_E = true;
+				}
+				if (player.get_Y()%100 > 100-(player.height/2)) {
+					if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)+1][parseInt(player.get_Y()/100)+1])) {
+						resistance_from_E = true;
+					}
+				}
+				if (player.get_Y()%100 < player.height/2) {
+					if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)+1][parseInt(player.get_Y()/100)-1])) {
+						resistance_from_E = true;
+					}
+				}
+			} else if (player.get_X()%100 < player.width/2) {
+				if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)-1][parseInt(player.get_Y()/100)])) {
+					resistance_from_W = true;
+				}
+				if (player.get_Y()%100 > 100-(player.height/2)) {
+					if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)-1][parseInt(player.get_Y()/100)+1])) {
+						resistance_from_W = true;
+					}
+				}
+				if (player.get_Y()%100 < player.height/2) {
+					if (is_impassable(current_chunk.data[parseInt(player.get_X()/100)-1][parseInt(player.get_Y()/100)-1])) {
+						resistance_from_W = true;
+					}
+				}
+			} else if (player.get_Y()%100 > 100-(player.height/2)) {
+				if (is_impassable(current_chunk.data[]))
+			} else if (player.get_Y()%100 < player.height/2) {
 
-			} else if (player.get_X() < player.width/2) {
-
-			} else if (player.get_Y() > 100-(player.height/2)) {
-
-			} else if (player.get_Y() < player.height/2) {
-
+			}
+			if (resistance_from_W || resistance_from_E) {
+				// set back to prior_loc
+				player.coordinates.x = prior_loc.x;
+			}
+			if (resistance_from_S || resistance_from_N) {
+				// set back to prior_loc
+				player.coordinates.y = prior_loc.y;
 			}
 
 
