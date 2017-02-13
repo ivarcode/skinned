@@ -26,7 +26,7 @@
 		/*DATA*/
 		var MAP = {_0:new Image(),_1:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
-		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:false/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/};
+		var GAME_STATS = {_SPEED:30,_CLOCK:null,_PAUSED:true/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/};
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false};
 
 		/*MAP IMGS*/
@@ -287,7 +287,7 @@
 					}
 				}
 			} else if (player.get_Y()%100 > 100-(player.height/2)) {
-				if (is_impassable(current_chunk.data[]))
+				// if (is_impassable(current_chunk.data[]))
 			} else if (player.get_Y()%100 < player.height/2) {
 
 			}
