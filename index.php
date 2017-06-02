@@ -28,7 +28,7 @@
 		var GAME_START_TIME = null;
 
 		var BG_IMG = new Image();
-		var MAP = {_0:new Image(),_1:new Image()};
+		var MAP = {dirt:new Image(),stone:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
 
 		/*DATA*/
@@ -38,8 +38,8 @@
 		BG_IMG.src = "./img/8b8d7fb.jpg";
 
 		/*MAP IMGS*/
-		MAP._0.src = "./img/map/map_0_9.png";
-		MAP._1.src = "./img/map/map_1_9.png";
+		MAP.dirt.src = "./img/map/dirt.png";
+		MAP.stone.src = "./img/map/stone.png";
 		
 		/*CHAR IMGS*/
 		CHAR._player.src = "./img/player.png";
@@ -48,9 +48,12 @@
 		var player = new Entity({slice:52,chunk:28,x:50,y:50},10,100,90,50,CHAR._player,"player");
 
 
-
+		console.log(new Date());
+		console.log("generating level...");
 		var levels = [];
-		levels[0] = new Level();
+		levels[0] = generate_level();
+
+		console.log(new Date());
 
 		camera.slice_index = 50;
 		camera.chunk_index = 24;
@@ -158,7 +161,8 @@
 					// console.log(sl+" "+ch+" "+i+" "+j+" "+x+" "+y);
 					switch (data) {
 						case 0: image = null;break;
-						case 1: image = MAP._1;break;
+						case 1: image = MAP.dirt;break;
+						case 2: image = MAP.stone;break;
 						default: throw "no valid case for mapid "+data;break;
 					}
 					if (image != null) {
@@ -266,6 +270,7 @@
 			}
 			if (player.momentum_horizontal > 0) {
 				var dist = (20*(Math.pow(((player.momentum_horizontal+1)/30),2)*32))-(20*(Math.pow(((player.momentum_horizontal)/30),2)*32));
+				console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (right_is_clear(player,levels[GAME_STATS._LEVEL])) {
 						player.move_east(1);
@@ -276,6 +281,9 @@
 				}
 			} else if (player.momentum_horizontal < 0) {
 				var dist = (20*(Math.pow(((Math.abs(player.momentum_horizontal)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(player.momentum_horizontal))/30),2)*32));
+				// to fix things? (still a slight inaccuracy on the equality of the movement speeds 14.93 to 14.86 with a default speed of 10)
+				dist *= 1.9;
+				console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (left_is_clear(player,levels[GAME_STATS._LEVEL])) {
 						player.move_west(1);
@@ -295,10 +303,16 @@
 			var center_chunk = camera.chunk_index+4;
 
 			if (player.coordinates.slice-center_slice > 1) {
-				move_camera_right(10);
+				if (player.coordinates.slice-center_slice > 2) {
+					move_camera_right(15);
+				}
+				move_camera_right(15);
 			}
 			if (player.coordinates.slice-center_slice < -1) {
-				move_camera_left(10);
+				if (player.coordinates.slice-center_slice < -2) {
+					move_camera_left(15);
+				}
+				move_camera_left(15);
 			}
 
 		}
