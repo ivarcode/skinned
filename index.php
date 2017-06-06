@@ -23,12 +23,12 @@
 
 
 		/*LOCATION DATA*/
-		var camera = {slice_index:null,chunk_index:null,x:null,y:null};
+		var camera = {x:null,y:null};
 
 		var GAME_START_TIME = null;
 
 		var BG_IMG = new Image();
-		var MAP = {dirt:new Image(),stone:new Image()};
+		var MAP = {dirt:new Image(),stone:new Image(),grass:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
 
 		/*DATA*/
@@ -40,23 +40,19 @@
 		/*MAP IMGS*/
 		MAP.dirt.src = "./img/map/dirt.png";
 		MAP.stone.src = "./img/map/stone.png";
+		MAP.grass.src = "./img/map/grass.png";
 		
 		/*CHAR IMGS*/
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
 
-		var player = new Entity({slice:52,chunk:28,x:50,y:50},10,100,90,50,CHAR._player,"player");
+		var player = new Entity({x:300,y:300},10,100,150,50,CHAR._player,"player");
 
 
-		console.log(new Date());
 		console.log("generating level...");
 		var levels = [];
 		levels[0] = generate_level();
 
-		console.log(new Date());
-
-		camera.slice_index = 50;
-		camera.chunk_index = 24;
 		camera.x = 0;
 		camera.y = 0;
 
@@ -150,26 +146,38 @@
 
 			context.drawImage(BG_IMG,0,0,900,900);
 
-			for (var i = 0; i < 120; i++) {
-				for (var j = 0; j < 120; j++) {
-					var sl = parseInt(i/11);
-					var ch = parseInt(j/11);
-					var x = (i%11);
-					var y = (j%11);
-					var data = level.slices[camera.slice_index+sl].chunks[camera.chunk_index+ch].data[y][x];
+			for (var i = 0; i < 101; i++) {
+				for (var j = 0; j < 101; j++) {
+					var sl = parseInt((camera.x+(i*9))/99);
+					var ch = parseInt((camera.y+(j*9))/99);
+					var x = parseInt(((camera.x+(i*9))%99)/9);
+					var y = parseInt(((camera.y+(j*9))%99)/9);
+					var data = null;
+					try {
+						data = level.slices[sl].chunks[ch].data[y][x];
+					} catch(e) {
+						throw "unable to get data :: level.slices["+sl+"].chunks["+ch+"].data["+y+"]["+x+"]\n"+e;
+					}
 					var image = null;
 					// console.log(sl+" "+ch+" "+i+" "+j+" "+x+" "+y);
 					switch (data) {
 						case 0: image = null;break;
 						case 1: image = MAP.dirt;break;
 						case 2: image = MAP.stone;break;
+						case 3: image = MAP.grass;break;
 						default: throw "no valid case for mapid "+data;break;
 					}
 					if (image != null) {
-						context.drawImage(image,i*9-camera.x,j*9-camera.y,9,9);
+						context.drawImage(image,i*9-(camera.x%9),j*9-(camera.y%9),9,9);
 					}
+					// if (x == 0 && j == 0) {
+					// 	// console.log("whats takin so long");
+					// 	context.rect(i*9-camera.x,0,0,800);
+						
+					// }
 				}
 			}
+			// context.stroke();
 			// for (var i = camera.slice_index; i < camera.slice_index+10; i++) {
 			// 	for (var j = camera.chunk_index; j < camera.chunk_index+10; j++) {
 			// 		var coordinates = (i+1)+","+j;
@@ -178,21 +186,32 @@
 			// }
 
 			// console.log(player.coordinates);
-			var ix = ((player.coordinates.slice-camera.slice_index)*99+player.coordinates.x)-camera.x;
-			var iy = ((player.coordinates.chunk-camera.chunk_index)*99+player.coordinates.y)-camera.y;
+			var ix = player.coordinates.x-camera.x;
+			var iy = player.coordinates.y-camera.y;
 			ix -= player.width/2;
 			iy -= player.height/2;
 			// console.log(ix+" "+iy);
+			// context.rect(ix-5,iy-5,10,10);
+			// context.rect(ix-player.width/2,iy-player.height/4,0,player.height/2);
+			// context.rect(ix+player.width/2,iy-player.height/4,0,player.height/2);
+			// context.rect(ix-player.width/4,iy-player.height/2,player.width/2,0);
+			// context.rect(ix-player.width/4,iy+player.height/2,player.width/2,0);
+			// context.stroke();
 			context.drawImage(player.img,ix,iy,player.width,player.height);
 
 
 			
 
 
-			context.fillStyle = "#FFFFFF";
-			context.font = "20px lucida console";
-			// context.fillText(player.health_points+" HP",40+player.health_points,50);
+			context.fillStyle = "#000000";
 			context.fillText(GAME_STATS._CLOCK,730,50);
+			context.font = "20px lucida console";
+			context.fillStyle = "#FFFFFF";
+			context.fillText(camera.x+" "+camera.y,50,850);
+			context.fillText(player.coordinates.x+" "+player.coordinates.y,50,870);
+			context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,200,870);
+			// context.fillText(player.health_points+" HP",40+player.health_points,50);
+			
 		}
 		/*function responsible for drawing the menu when the game is paused*/
 		function draw_menu() {
@@ -270,7 +289,7 @@
 			}
 			if (player.momentum_horizontal > 0) {
 				var dist = (20*(Math.pow(((player.momentum_horizontal+1)/30),2)*32))-(20*(Math.pow(((player.momentum_horizontal)/30),2)*32));
-				console.log(dist);
+				// console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (right_is_clear(player,levels[GAME_STATS._LEVEL])) {
 						player.move_east(1);
@@ -283,7 +302,7 @@
 				var dist = (20*(Math.pow(((Math.abs(player.momentum_horizontal)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(player.momentum_horizontal))/30),2)*32));
 				// to fix things? (still a slight inaccuracy on the equality of the movement speeds 14.93 to 14.86 with a default speed of 10)
 				dist *= 1.9;
-				console.log(dist);
+				// console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (left_is_clear(player,levels[GAME_STATS._LEVEL])) {
 						player.move_west(1);
@@ -299,59 +318,51 @@
 		/*function responsible for adjusting the camera when the player is out of range*/
 		function set_camera() {
 
-			var center_slice = camera.slice_index+4;
-			var center_chunk = camera.chunk_index+4;
+			var center_x = camera.x+450;
+			var center_y = camera.y+450;
 
-			if (player.coordinates.slice-center_slice > 1) {
-				if (player.coordinates.slice-center_slice > 2) {
-					move_camera_right(15);
-				}
-				move_camera_right(15);
+			if (player.coordinates.x - center_x > 150) {
+				move_camera_right(player.coordinates.x-(center_x+150));
 			}
-			if (player.coordinates.slice-center_slice < -1) {
-				if (player.coordinates.slice-center_slice < -2) {
-					move_camera_left(15);
-				}
-				move_camera_left(15);
+			if (player.coordinates.x - center_x < -150) {
+				move_camera_left(Math.abs(player.coordinates.x-(center_x-150)));
 			}
+			if (player.coordinates.y - center_y > 150) {
+				move_camera_down(player.coordinates.y-(center_y+150));
+			}
+			if (player.coordinates.y - center_y < -150) {
+				move_camera_up(Math.abs(player.coordinates.y-(center_y-150)));
+			}
+
+			// var center_slice = camera.slice_index+4;
+			// var center_chunk = camera.chunk_index+4;
+
+			// if (player.coordinates.slice-center_slice > 1) {
+			// 	if (player.coordinates.slice-center_slice > 2) {
+			// 		move_camera_right(15);
+			// 	}
+			// 	move_camera_right(15);
+			// }
+			// if (player.coordinates.slice-center_slice < -1) {
+			// 	if (player.coordinates.slice-center_slice < -2) {
+			// 		move_camera_left(15);
+			// 	}
+			// 	move_camera_left(15);
+			// }
 
 		}
 
 		function move_camera_right(dist) {
-			if (camera.x+dist > 99) {
-				var s = parseInt((camera.x+dist)/99);
-				camera.slice_index += s;
-				camera.x = camera.x+dist-(99*s);
-			} else {
-				camera.x += dist;
-			}
+			camera.x+=dist;
 		}
 		function move_camera_left(dist) {
-			if (camera.x-dist < 0) {
-				var s = parseInt((camera.x-dist)/99)+1;
-				camera.slice_index -= s;
-				camera.x = camera.x-dist+(99*s);
-			} else {
-				camera.x -= dist;
-			}
+			camera.x-=dist;
 		}
 		function move_camera_down(dist) {
-			if (camera.y+dist > 99) {
-				var s = parseInt((camera.y+dist)/99);
-				camera.chunk_index += s;
-				camera.y = camera.y+dist-(99*s);
-			} else {
-				camera.y += dist;
-			}
+			camera.y+=dist;
 		}
 		function move_camera_up(dist) {
-			if (camera.y-dist < 0) {
-				var s = parseInt((camera.y-dist)/99)+1;
-				camera.chunk_index -= s;
-				camera.y = camera.y-dist+(99*s);
-			} else {
-				camera.y -= dist;
-			}
+			camera.y-=dist;
 		}
 
 		function set_clock() {

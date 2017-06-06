@@ -39,6 +39,10 @@ function generate_level() {
 		for (var y = 0; y < 550; y++) {
 			if (y > sea_lvl + pts_of_elevation[x]) {
 				edit_data(level,x,y,2);
+			} else if (y > sea_lvl + pts_of_elevation[x] - 3) {
+				edit_data(level,x,y,1);
+			} else if (y > sea_lvl + pts_of_elevation[x] - 4) {
+				edit_data(level,x,y,3);
 			} else {
 				edit_data(level,x,y,0);
 			}
