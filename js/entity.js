@@ -60,7 +60,7 @@ function get_data_in_relation_to_player(x,y,player,level) {
 	
 	// console.log(sl,ch,xx,yy);
 	// console.log(level.slices[sl].chunks[ch].data[parseInt(xx/9)][parseInt(yy/9)]);
-	return level.slices[sl].chunks[ch].data[yy][xx];
+	return level.slices[sl].chunks[ch].data[yy][xx].id;
 }
 
 

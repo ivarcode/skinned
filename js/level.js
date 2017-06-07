@@ -8,6 +8,7 @@ function Level() {
 	for (var i = 0; i < 100; i++) {
 		this.slices[i] = new Slice();
 	}
+	// set_lighting(this);
 }
 
 
@@ -51,9 +52,51 @@ function generate_level() {
 	return level;
 }
 
-
+function get_data(level,x,y) {
+	return level.slices[parseInt(x/11)].chunks[parseInt(y/11)].data[y%11][x%11];
+}
 
 function edit_data(level,x,y,id) {
 	// console.log(x,y,id);
-	level.slices[parseInt(x/11)].chunks[parseInt(y/11)].data[y%11][x%11] = id;
+	level.slices[parseInt(x/11)].chunks[parseInt(y/11)].data[y%11][x%11] = new Data(id);
+}
+
+function set_light_level(level,x,y,light_level) {
+	level.slices[parseInt(x/11)].chunks[parseInt(y/11)].data[y%11][x%11].light_level = light_level;
+}
+
+function set_lighting(level) {
+	// sets the light levels of the data in level
+	console.log("set_lighting start");
+	var bool = false;
+	for (var x = 0; x < 1100; x++) {
+		for (var y = 0; y < 550; y++) {
+			// console.log(get_data(level,x,y).id);
+			if (get_data(level,x,y).id == 0) {
+				if (y != 0) {
+					if (Number.isFinite(get_data(level,x,y-1).light_level)) {
+						set_light_level(level,x,y,get_data(level,x,y-1).light_level-1);
+					} else {
+						set_light_level(level,x,y,Infinity);
+					}
+				} else {
+					set_light_level(level,x,y,Infinity);
+				}
+			} else {
+				bool = true;
+				if (y != 0) {
+					if (Number.isFinite(get_data(level,x,y-1).light_level)) {
+						set_light_level(level,x,y,get_data(level,x,y-1).light_level/2);
+					} else {
+						set_light_level(level,x,y,10);
+					}
+				} else {
+					set_light_level(level,x,y,Infinity);
+				}
+			}
+		}
+	}
+	console.log(bool);
+	console.log("set_lighting end");
+
 }

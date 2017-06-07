@@ -18,6 +18,7 @@
 	<script type="text/javascript" src="./js/slice.js"></script>
 	<script type="text/javascript" src="./js/chunk.js"></script>
 	<script type="text/javascript" src="./js/entity.js"></script>
+	<script type="text/javascript" src="./js/data.js"></script>
 	
 	<script type="text/javascript">
 
@@ -52,6 +53,7 @@
 		console.log("generating level...");
 		var levels = [];
 		levels[0] = generate_level();
+		set_lighting(levels[0]);
 
 		camera.x = 0;
 		camera.y = 0;
@@ -152,24 +154,32 @@
 					var ch = parseInt((camera.y+(j*9))/99);
 					var x = parseInt(((camera.x+(i*9))%99)/9);
 					var y = parseInt(((camera.y+(j*9))%99)/9);
-					var data = null;
+					var data_id = null;
 					try {
-						data = level.slices[sl].chunks[ch].data[y][x];
+						data_id = level.slices[sl].chunks[ch].data[y][x].id;
 					} catch(e) {
-						throw "unable to get data :: level.slices["+sl+"].chunks["+ch+"].data["+y+"]["+x+"]\n"+e;
+						throw "unable to get data_id :: level.slices["+sl+"].chunks["+ch+"].data["+y+"]["+x+"]\n"+e;
 					}
 					var image = null;
 					// console.log(sl+" "+ch+" "+i+" "+j+" "+x+" "+y);
-					switch (data) {
+					switch (data_id) {
 						case 0: image = null;break;
 						case 1: image = MAP.dirt;break;
 						case 2: image = MAP.stone;break;
 						case 3: image = MAP.grass;break;
-						default: throw "no valid case for mapid "+data;break;
+						default: throw "no valid case for mapid "+data_id;break;
 					}
 					if (image != null) {
 						context.drawImage(image,i*9-(camera.x%9),j*9-(camera.y%9),9,9);
 					}
+					if (Number.isFinite(level.slices[sl].chunks[ch].data[y][x].light_level)) {
+						context.globalAlpha = 1-(level.slices[sl].chunks[ch].data[y][x].light_level*0.1);
+						if (context.globalAlpha != 0) {
+							context.fillStyle = "#000000";
+							context.fillRect(i*9-(camera.x%9),j*9-(camera.y%9),9,9);
+						}
+					}
+					context.globalAlpha = 1;
 					// if (x == 0 && j == 0) {
 					// 	// console.log("whats takin so long");
 					// 	context.rect(i*9-camera.x,0,0,800);
@@ -207,9 +217,12 @@
 			context.fillText(GAME_STATS._CLOCK,730,50);
 			context.font = "20px lucida console";
 			context.fillStyle = "#FFFFFF";
-			context.fillText(camera.x+" "+camera.y,50,850);
-			context.fillText(player.coordinates.x+" "+player.coordinates.y,50,870);
-			context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,200,870);
+			context.fillText("camera",50,850);
+			context.fillText(camera.x+" "+camera.y,150,850);
+			context.fillText("player",50,870);
+			context.fillText(player.coordinates.x+" "+player.coordinates.y,150,870);
+			context.fillText("momentum h/v",300,870);
+			context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,470,870);
 			// context.fillText(player.health_points+" HP",40+player.health_points,50);
 			
 		}
@@ -412,6 +425,11 @@
 			GAME_STATS._CLOCK = time;
 		}
 
+		function TEST_CODE() {
+			// solely a test function don't get excited
+			// console.log(get_data_in_relation_to_player(0,player.height/2,player,levels[GAME_STATS._LEVEL]));
+		}
+
 		/*function responsible for controlling the game timer and tempo*/
 		function tick(speed) {
 			console.log("tick");
@@ -419,6 +437,7 @@
 			// console.log(GAME_STATS._CLOCK);
 
 			if (!GAME_STATS._PAUSED) {
+				TEST_CODE();
 				set_camera();
 				move_player();
 				set_clock();

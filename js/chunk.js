@@ -13,21 +13,24 @@ function Chunk() {
 	}
 }
 
+
+
+
 /*chunk generations*/
 function empty_chunk() {
 	var c = new Chunk();
 	var new_data = [
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
+	[new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0),new Data(0)],
 	];
 	c.data = new_data;
 	return c;
@@ -35,17 +38,17 @@ function empty_chunk() {
 function solid_chunk() {
 	var c = new Chunk();
 	var new_data = [
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1)],
+	[new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),new Data(1),1],
 	];
 	c.data = new_data;
 	return c;
