@@ -34,7 +34,7 @@ function generate_level() {
 			pts_of_elevation.push(wide_pts_of_elevation[j]-parseInt(k*(wide_pts_of_elevation[j]-wide_pts_of_elevation[j+1])/22));
 		}
 	}
-	add_noise(pts_of_elevation,1);
+	// add_noise(pts_of_elevation,1);
 	console.log(pts_of_elevation);
 	for (var x = 0; x < 1100; x++) {
 		for (var y = 0; y < 550; y++) {

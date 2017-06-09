@@ -25,9 +25,12 @@
 
 		/*LOCATION DATA*/
 		var camera = {x:null,y:null};
+		var mouse_over_canvas = false;
+		var current_mouse_pos = {x:null,y:null};
 
 		var GAME_START_TIME = null;
 
+		var PIN_IMG = new Image();
 		var BG_IMG = new Image();
 		var MAP = {dirt:new Image(),stone:new Image(),grass:new Image()};
 		var CHAR = {_player:new Image(),_enemy:new Image()};
@@ -37,6 +40,7 @@
 		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false,_space_IS_PRESSED:false};
 
 		BG_IMG.src = "./img/8b8d7fb.jpg";
+		PIN_IMG.src = "./img/map-pin.png";
 
 		/*MAP IMGS*/
 		MAP.dirt.src = "./img/map/dirt.png";
@@ -47,7 +51,9 @@
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
 
-		var player = new Entity({x:300,y:300},10,100,150,50,CHAR._player,"player");
+		var player = new Entity({x:500,y:2700},10,100,150,50,CHAR._player,"player");
+		var enemies = [];
+		enemies.push(new Entity({x:1000,y:2700},10,100,120,50,CHAR._enemy,"enemy"));  
 
 
 		console.log("generating level...");
@@ -57,6 +63,8 @@
 
 		camera.x = 0;
 		camera.y = 0;
+
+		var pins = [];
 
 
 		function setup() {
@@ -82,6 +90,7 @@
 				/*KEYPRESSED == 'A'*/
 				if (keycode == 65) {
 					KEY_DATA._a_IS_PRESSED = true;
+					player.face = 'l';
 				}
 				/*KEYPRESSED == 'S'*/
 				if (keycode == 83) {
@@ -90,6 +99,7 @@
 				/*KEYPRESSED == 'D'*/
 				if (keycode == 68) {
 					KEY_DATA._d_IS_PRESSED = true;
+					player.face = 'r';
 				}
 				/*KEYPRESSED == 'P'*/
 				if (keycode == 80) {
@@ -131,12 +141,90 @@
 					KEY_DATA._space_IS_PRESSED = false;
 				}
 			});
+			/*window eventlisteners for mousedown and mouseup*/
+			game_canvas.addEventListener('mousedown',function(events) {
+				if (events.button === 0 /*left mousebutton pressed*/) {
+					if (current_mouse_pos.x > player.coordinates.x-camera.x && player.face == 'l') {
+						player.face = 'r';
+					} else if (current_mouse_pos.x < player.coordinates.x-camera.x && player.face == 'r') {
+						player.face = 'l';
+					} else {
+						// do nothing
+					}
+					player.strike();
+				} else if (events.button === 2 /*right mousebutton pressed*/) {
+					
+				}
+				mousedown = true;
+			});
+
+			game_canvas.addEventListener('mouseenter',function(events){
+				mouse_over_canvas = true;
+			});
+			game_canvas.addEventListener('mouseleave',function(events){
+				mouse_over_canvas = false;
+			});
+			game_canvas.addEventListener('mousemove',function(events){
+				if (mouse_over_canvas) {
+					current_mouse_pos = get_mouse_pos(game_canvas,events);
+				}
+			});
 
 			// start timing function at end of setup
 			GAME_START_TIME = new Date();
 			console.log("Game begins "+GAME_START_TIME+".");
 			tick();
 
+		}
+
+		function get_mouse_pos(canvas,events) {
+			/*returns an object {x,y} that contain the mousePos data from events on the canvas*/
+			var obj = canvas;
+			var top = 0, left = 0;
+			var mX = 0, mY = 0;
+			while (obj && obj.tagName != 'BODY') {
+				top += obj.offsetTop;
+				left += obj.offsetLeft;
+				obj = obj.offsetParent;
+			}
+			mX = events.clientX - left + window.pageXOffset;
+			mY = events.clientY - top + window.pageYOffset;
+			return { x: mX, y: mY };
+		}
+
+		/*function responsible for causing entity actions during gameplay*/
+		function actions() {
+			if (player.current_action != null) {
+				switch (player.current_action) {
+					// STRIKE
+					case "strike": if (player.face == 'r') {
+						for (var i = 0; i < enemies.length; i++) {
+							if (contacts_hitbox(enemies[i],player.coordinates.x+(player.width/2),player.coordinates.y)) {
+								enemies[i].momentum_horizontal += 3;
+								console.log("strike!");
+							}
+						}
+					} else if (player.face == 'l') {
+						for (var i = 0; i < enemies.length; i++) {
+							if (contacts_hitbox(enemies[i],player.coordinates.x-(player.width/2),player.coordinates.y)) {
+								enemies[i].momentum_horizontal -= 3;
+								console.log("strike!");
+							}
+						}
+					} else {
+						throw "ya gotta face somewhere";
+					}
+					// add_pin("strike pin",player.coordinates.x+(player.width/2),player.coordinates.y);
+					break;
+				}
+				player.current_action = null;
+			}
+			
+		}
+
+		/*function adds a new pin to the pins array*/
+		function add_pin(name,x,y) {
+			pins.push({name:name,x:x,y:y});
 		}
 
 		/*function responsible for drawing the game after each tick*/
@@ -146,7 +234,9 @@
 
 			var level = levels[GAME_STATS._LEVEL];
 
-			context.drawImage(BG_IMG,0,0,900,900);
+			var map_width = 9900;
+			var map_height = 4450;
+			context.drawImage(BG_IMG,-(camera.x/9900)*900,-(camera.y/4450)*900,1800,1800);
 
 			for (var i = 0; i < 101; i++) {
 				for (var j = 0; j < 101; j++) {
@@ -208,7 +298,17 @@
 			// context.rect(ix-player.width/4,iy+player.height/2,player.width/2,0);
 			// context.stroke();
 			context.drawImage(player.img,ix,iy,player.width,player.height);
+			for (var i = 0; i < enemies.length; i++) {
+				context.drawImage(enemies[i].img,(enemies[i].coordinates.x-enemies[i].width/2)-camera.x,(enemies[i].coordinates.y-enemies[i].height/2)-camera.y,enemies[i].width,enemies[i].height);
+			}
 
+			// context.fillRect(player.coordinates.x-5,0,10,900);
+
+			// draw pins
+			for (var i = 0; i < pins.length; i++) {
+				// console.log("pin @ "+pins[i].x,+","+pins[i].y);
+				context.drawImage(PIN_IMG,pins[i].x-(10+camera.x),pins[i].y-(20+camera.y),20,20);
+			}
 
 			
 
@@ -223,6 +323,8 @@
 			context.fillText(player.coordinates.x+" "+player.coordinates.y,150,870);
 			context.fillText("momentum h/v",300,870);
 			context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,470,870);
+			context.fillText(player.face,550,870);
+			context.fillText("mouse "+current_mouse_pos.x+","+current_mouse_pos.y,700,870);
 			// context.fillText(player.health_points+" HP",40+player.health_points,50);
 			
 		}
@@ -252,6 +354,12 @@
 			}
 			if (KEY_DATA._a_IS_PRESSED) {
 				player.momentum_horizontal = -player.get_speed();
+				// if (false && player.momentum_horizontal > -player.get_speed()) {
+				// 	player.momentum_horizontal -= 1;
+				// } else {
+				// 	// player.momentum_horizontal = -player.get_speed();
+				// 	// do nothing
+				// }
 			} else {
 				player.momentum_horizontal = parseInt(player.momentum_horizontal/2);
 			}
@@ -260,6 +368,9 @@
 			}
 			if (KEY_DATA._d_IS_PRESSED) {
 				player.momentum_horizontal = player.get_speed();
+				// if (player.momentum_horizontal < player.get_speed()) {
+				// 	player.momentum_horizontal += 1;
+				// }
 			} else {
 				player.momentum_horizontal = parseInt(player.momentum_horizontal/2);
 			}
@@ -305,7 +416,17 @@
 				// console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (right_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						player.move_east(1);
+						if (feet_right_is_clear(player,levels[GAME_STATS._LEVEL],4) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],3) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],2) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],1)) {
+							player.move_east(1);
+						} else {
+							if (!feet_right_is_clear(player,levels[GAME_STATS._LEVEL],1) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],2)) {
+								player.move_east(1);
+								player.move_north(9);
+							} else {
+								player.momentum_horizontal = 0;
+								break;
+							}
+						}
 					} else {
 						player.momentum_horizontal = 0;
 						break;
@@ -318,13 +439,24 @@
 				// console.log(dist);
 				for (var d = dist; d > 0; d--) {
 					if (left_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						player.move_west(1);
+						if (feet_left_is_clear(player,levels[GAME_STATS._LEVEL],4) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],3) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],2) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],1)) {
+							player.move_west(1);
+						} else {
+							if (!feet_left_is_clear(player,levels[GAME_STATS._LEVEL],1) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],2)) {
+								player.move_west(1);
+								player.move_north(9);
+							} else {
+								player.momentum_horizontal = 0;
+								break;
+							}
+						}
 					} else {
 						player.momentum_horizontal = 0;
 						break;
 					}
 				}
 			}
+
 		}
 		
 
@@ -439,6 +571,7 @@
 			if (!GAME_STATS._PAUSED) {
 				TEST_CODE();
 				set_camera();
+				actions();
 				move_player();
 				set_clock();
 				draw();

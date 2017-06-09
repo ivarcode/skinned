@@ -13,6 +13,9 @@ function Entity(coord,speed,hp,height,width,img,type) {
 	this.type = type;
 	this.momentum_vertical = 0;
 	this.momentum_horizontal = 0;
+	this.current_action = null;
+	this.current_item = null;
+	this.face = 'r';
 }
 
 /*Entity prototype functions*/
@@ -47,6 +50,30 @@ Entity.prototype.get_Y = function() {
 	return this.coordinates.y;
 };
 
+
+/*action setters*/
+Entity.prototype.strike = function() {
+	// sets this.current_action for one armed strike
+	this.current_action = "strike";
+};
+
+
+/*return true if the entity's hitbox contains x,y   returns false otherwise*/
+function contacts_hitbox(entity,x,y) {
+	if (x < entity.coordinates.x-(entity.width/2)) {
+		return false;
+	}
+	if (x > entity.coordinates.x+(entity.width/2)) {
+		return false;
+	}
+	if (y < entity.coordinates.y-(entity.height/2)) {
+		return false;
+	}
+	if (y > entity.coordinates.y+(entity.height/2)) {
+		return false;
+	}
+	return true;
+}
 
 
 /*map getters*/
@@ -98,6 +125,20 @@ function left_is_clear(player,level) {
 		if (get_data_in_relation_to_player(-parseInt(player.width/2),i-(player.height/4),player,level) != 0) {
 			return false;
 		}
+	}
+	return true;
+}
+/*checks if the space to the right of the feet of the player is clear to how many blocks 'x'*/
+function feet_right_is_clear(player,level,x) {
+	if (get_data_in_relation_to_player(parseInt(player.width/4),(player.height/2)-((x-1)*9)-1,player,level) != 0) {
+		return false;
+	}
+	return true;
+}
+/*checks if the space to the left of the feet of the player is clear to how many blocks 'x'*/
+function feet_left_is_clear(player,level,x) {
+	if (get_data_in_relation_to_player(-parseInt(player.width/4),(player.height/2)-((x-1)*9)-1,player,level) != 0) {
+		return false;
 	}
 	return true;
 }
