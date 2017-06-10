@@ -19,6 +19,7 @@
 	<script type="text/javascript" src="./js/chunk.js"></script>
 	<script type="text/javascript" src="./js/entity.js"></script>
 	<script type="text/javascript" src="./js/data.js"></script>
+	<script type="text/javascript" src="./js/item.js"></script>
 	
 	<script type="text/javascript">
 
@@ -32,12 +33,33 @@
 
 		var PIN_IMG = new Image();
 		var BG_IMG = new Image();
-		var MAP = {dirt:new Image(),stone:new Image(),grass:new Image()};
-		var CHAR = {_player:new Image(),_enemy:new Image()};
+		var MAP = {
+			dirt:new Image(),
+			stone:new Image(),
+			grass:new Image()
+		};
+		var CHAR = {
+			_player:new Image(),
+			_enemy:new Image()
+		};
 
 		/*DATA*/
-		var GAME_STATS = {_LEVEL:0,_SPEED:30/*should be 30*/,_CLOCK:null,_TOTAL_GAME_TIME_PAUSED:0,_PAUSE_CLOCK:null,_PAUSED:false/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/};
-		var KEY_DATA = {_w_IS_PRESSED:false,_a_IS_PRESSED:false,_s_IS_PRESSED:false,_d_IS_PRESSED:false,_p_IS_PRESSED:false,_space_IS_PRESSED:false};
+		var GAME_STATS = {
+			_LEVEL:0,
+			_SPEED:30/*should be 30*/,
+			_CLOCK:null,
+			_TOTAL_GAME_TIME_PAUSED:0,
+			_PAUSE_CLOCK:null,
+			_PAUSED:false/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/
+		};
+		var KEY_DATA = {
+			_w_IS_PRESSED:false,
+			_a_IS_PRESSED:false,
+			_s_IS_PRESSED:false,
+			_d_IS_PRESSED:false,
+			_p_IS_PRESSED:false,
+			_space_IS_PRESSED:false
+		};
 
 		BG_IMG.src = "./img/8b8d7fb.jpg";
 		PIN_IMG.src = "./img/map-pin.png";
@@ -51,15 +73,21 @@
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
 
-		var player = new Entity({x:500,y:2700},10,100,150,50,CHAR._player,"player");
+		var player = new Entity({x:2000,y:2000},10,100,150,50,CHAR._player,"player");
 		var enemies = [];
-		enemies.push(new Entity({x:1000,y:2700},10,100,120,50,CHAR._enemy,"enemy"));  
+		enemies.push(new Entity({x:1200,y:2000},10,100,120,50,CHAR._enemy,"enemy"));
 
 
 		console.log("generating level...");
 		var levels = [];
-		levels[0] = generate_level();
+		levels[0] = generate_level_gym();
+		
+		place_item_at(levels[0],get_torch(),1010,2850);
+
 		set_lighting(levels[0]);
+		// set_lighting_to(levels[0],1);
+
+
 
 		camera.x = 0;
 		camera.y = 0;
@@ -233,10 +261,11 @@
 			context.restore();
 
 			var level = levels[GAME_STATS._LEVEL];
+			// console.log(level);
 
-			var map_width = 9900;
-			var map_height = 4450;
-			context.drawImage(BG_IMG,-(camera.x/9900)*900,-(camera.y/4450)*900,1800,1800);
+			var map_width = 99*level.slices.length;
+			var map_height = 99*level.slices[0].chunks.length;
+			context.drawImage(BG_IMG,-(camera.x/map_width)*900,-(camera.y/map_height)*900,1800,1800);
 
 			for (var i = 0; i < 101; i++) {
 				for (var j = 0; j < 101; j++) {
@@ -244,9 +273,11 @@
 					var ch = parseInt((camera.y+(j*9))/99);
 					var x = parseInt(((camera.x+(i*9))%99)/9);
 					var y = parseInt(((camera.y+(j*9))%99)/9);
+					// console.log(i,j,sl,ch,x,y,camera);
 					var data_id = null;
 					try {
 						data_id = level.slices[sl].chunks[ch].data[y][x].id;
+						// console.log(data_id);
 					} catch(e) {
 						throw "unable to get data_id :: level.slices["+sl+"].chunks["+ch+"].data["+y+"]["+x+"]\n"+e;
 					}
@@ -302,6 +333,12 @@
 				context.drawImage(enemies[i].img,(enemies[i].coordinates.x-enemies[i].width/2)-camera.x,(enemies[i].coordinates.y-enemies[i].height/2)-camera.y,enemies[i].width,enemies[i].height);
 			}
 
+			// draw items
+			for (var i = 0; i < level.items.length; i++) {
+				var it = level.items[i];
+				context.drawImage(it.img,(it.coordinates.x-it.width/2)-camera.x,(it.coordinates.y-it.height/2)-camera.y,it.width,it.height);
+			}
+
 			// context.fillRect(player.coordinates.x-5,0,10,900);
 
 			// draw pins
@@ -343,8 +380,106 @@
 
 		}
 
+		/*function calls move_entity(for each entity)*/
+		function move_entities() {
+			move_entity(player);
+			for (var i = 0; i < enemies.length; i++) {
+				move_entity(enemies[i]);
+			}
+		}
+
+		/*function responsible for moving a single entity*/
+		function move_entity(entity) {
+			// move entity
+			if (entity.momentum_vertical > 0) {
+				var dist = (20*(Math.pow(((entity.momentum_vertical+1)/30),2)*32))-(20*(Math.pow(((entity.momentum_vertical)/30),2)*32));
+				// console.log(entity.momentum_vertical);
+				// console.log(dist);
+				for (var d = dist; d > 0; d--) {
+					if (top_is_clear(entity,levels[GAME_STATS._LEVEL])) {
+						entity.move_north(1);
+					} else {
+						entity.momentum_vertical = 0;
+						break;
+					}
+				}
+			} else if (entity.momentum_vertical < 0) {
+				var dist = (20*(Math.pow(((Math.abs(entity.momentum_vertical)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(entity.momentum_vertical))/30),2)*32));
+				// console.log(entity.momentum_vertical);
+				// console.log(dist);
+				for (var d = dist; d > 0; d--) {
+					if (base_is_clear(entity,levels[GAME_STATS._LEVEL])) {
+						entity.move_south(1);
+					} else {
+						entity.momentum_vertical = 0;
+						// console.log((entity.height/2));
+						// console.log("break");
+						break;
+					}
+				}
+			}
+			if (entity.momentum_horizontal > 0) {
+				var dist = (20*(Math.pow(((entity.momentum_horizontal+1)/30),2)*32))-(20*(Math.pow(((entity.momentum_horizontal)/30),2)*32));
+				// console.log(dist);
+				for (var d = dist; d > 0; d--) {
+					if (right_is_clear(entity,levels[GAME_STATS._LEVEL])) {
+						if (feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],4) && feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],3) && feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],2) && feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],1)) {
+							entity.move_east(1);
+						} else {
+							if (!feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],1) && feet_right_is_clear(entity,levels[GAME_STATS._LEVEL],2)) {
+								entity.move_east(1);
+								entity.move_north(9);
+							} else {
+								entity.momentum_horizontal = 0;
+								break;
+							}
+						}
+					} else {
+						entity.momentum_horizontal = 0;
+						break;
+					}
+				}
+			} else if (entity.momentum_horizontal < 0) {
+				var dist = (20*(Math.pow(((Math.abs(entity.momentum_horizontal)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(entity.momentum_horizontal))/30),2)*32));
+				// to fix things? (still a slight inaccuracy on the equality of the movement speeds 14.93 to 14.86 with a default speed of 10)
+				dist *= 1.9;
+				// console.log(dist);
+				for (var d = dist; d > 0; d--) {
+					if (left_is_clear(entity,levels[GAME_STATS._LEVEL])) {
+						if (feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],4) && feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],3) && feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],2) && feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],1)) {
+							entity.move_west(1);
+						} else {
+							if (!feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],1) && feet_left_is_clear(entity,levels[GAME_STATS._LEVEL],2)) {
+								entity.move_west(1);
+								entity.move_north(9);
+							} else {
+								entity.momentum_horizontal = 0;
+								break;
+							}
+						}
+					} else {
+						entity.momentum_horizontal = 0;
+						break;
+					}
+				}
+			}
+
+		}
+
+		/*function responsible for enemy decisions*/
+		function enemy_ai() {
+			for (var i = 0; i < enemies.length; i++) {
+				gravity(enemies[i]);
+
+				if (enemies[i].momentum_horizontal != 0) {
+					enemies[i].momentum_horizontal = parseInt(enemies[i].momentum_horizontal/2);
+				}
+
+			}
+		}
+
 		/*function responsible for handling player movement*/
-		function move_player() {
+		function control_player() {
 
 			// console.log(player.momentum_vertical);
 			// console.log(player.momentum_horizontal);
@@ -383,80 +518,7 @@
 			gravity(player);
 
 
-			// move player
-			if (player.momentum_vertical > 0) {
-				var dist = (20*(Math.pow(((player.momentum_vertical+1)/30),2)*32))-(20*(Math.pow(((player.momentum_vertical)/30),2)*32));
-				// console.log(player.momentum_vertical);
-				// console.log(dist);
-				for (var d = dist; d > 0; d--) {
-					if (top_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						player.move_north(1);
-					} else {
-						player.momentum_vertical = 0;
-						break;
-					}
-				}
-			} else if (player.momentum_vertical < 0) {
-				var dist = (20*(Math.pow(((Math.abs(player.momentum_vertical)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(player.momentum_vertical))/30),2)*32));
-				// console.log(player.momentum_vertical);
-				// console.log(dist);
-				for (var d = dist; d > 0; d--) {
-					if (base_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						player.move_south(1);
-					} else {
-						player.momentum_vertical = 0;
-						// console.log((player.height/2));
-						// console.log("break");
-						break;
-					}
-				}
-			}
-			if (player.momentum_horizontal > 0) {
-				var dist = (20*(Math.pow(((player.momentum_horizontal+1)/30),2)*32))-(20*(Math.pow(((player.momentum_horizontal)/30),2)*32));
-				// console.log(dist);
-				for (var d = dist; d > 0; d--) {
-					if (right_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						if (feet_right_is_clear(player,levels[GAME_STATS._LEVEL],4) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],3) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],2) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],1)) {
-							player.move_east(1);
-						} else {
-							if (!feet_right_is_clear(player,levels[GAME_STATS._LEVEL],1) && feet_right_is_clear(player,levels[GAME_STATS._LEVEL],2)) {
-								player.move_east(1);
-								player.move_north(9);
-							} else {
-								player.momentum_horizontal = 0;
-								break;
-							}
-						}
-					} else {
-						player.momentum_horizontal = 0;
-						break;
-					}
-				}
-			} else if (player.momentum_horizontal < 0) {
-				var dist = (20*(Math.pow(((Math.abs(player.momentum_horizontal)+1)/30),2)*32))-(20*(Math.pow(((Math.abs(player.momentum_horizontal))/30),2)*32));
-				// to fix things? (still a slight inaccuracy on the equality of the movement speeds 14.93 to 14.86 with a default speed of 10)
-				dist *= 1.9;
-				// console.log(dist);
-				for (var d = dist; d > 0; d--) {
-					if (left_is_clear(player,levels[GAME_STATS._LEVEL])) {
-						if (feet_left_is_clear(player,levels[GAME_STATS._LEVEL],4) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],3) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],2) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],1)) {
-							player.move_west(1);
-						} else {
-							if (!feet_left_is_clear(player,levels[GAME_STATS._LEVEL],1) && feet_left_is_clear(player,levels[GAME_STATS._LEVEL],2)) {
-								player.move_west(1);
-								player.move_north(9);
-							} else {
-								player.momentum_horizontal = 0;
-								break;
-							}
-						}
-					} else {
-						player.momentum_horizontal = 0;
-						break;
-					}
-				}
-			}
-
+			
 		}
 		
 
@@ -571,8 +633,10 @@
 			if (!GAME_STATS._PAUSED) {
 				TEST_CODE();
 				set_camera();
+				enemy_ai();
+				control_player();
 				actions();
-				move_player();
+				move_entities();
 				set_clock();
 				draw();
 			} else {

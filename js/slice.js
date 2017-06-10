@@ -3,9 +3,9 @@ slice.js
 */
 
 /*Slice object constructor*/
-function Slice() {
+function Slice(c) {
 	this.chunks = [];
-	for (var i = 0; i < 50; i++) {
+	for (var i = 0; i < c; i++) {
 		this.chunks[i] = empty_chunk();
 	}
 }
