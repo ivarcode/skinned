@@ -73,7 +73,7 @@
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
 
-		var player = new Entity({x:2000,y:2000},10,100,150,50,CHAR._player,"player");
+		var player = new Entity({x:1300,y:2000},10,100,150,50,CHAR._player,"player");
 		var enemies = [];
 		enemies.push(new Entity({x:1200,y:2000},10,100,120,50,CHAR._enemy,"enemy"));
 
@@ -82,11 +82,13 @@
 		var levels = [];
 		levels[0] = generate_level_gym();
 		
+		console.log(get_torch());
 		place_item_at(levels[0],get_torch(),1010,2850);
 
 		set_lighting(levels[0]);
 		// set_lighting_to(levels[0],1);
 
+		// print_lighting(levels[0].lighting);
 
 
 		camera.x = 0;
@@ -293,14 +295,14 @@
 					if (image != null) {
 						context.drawImage(image,i*9-(camera.x%9),j*9-(camera.y%9),9,9);
 					}
-					if (Number.isFinite(level.slices[sl].chunks[ch].data[y][x].light_level)) {
-						context.globalAlpha = 1-(level.slices[sl].chunks[ch].data[y][x].light_level*0.1);
-						if (context.globalAlpha != 0) {
-							context.fillStyle = "#000000";
-							context.fillRect(i*9-(camera.x%9),j*9-(camera.y%9),9,9);
-						}
-					}
-					context.globalAlpha = 1;
+					// if (Number.isFinite(level)) {
+					// 	context.globalAlpha = 1-(level.slices[sl].chunks[ch].data[y][x].light_level*0.1);
+					// 	if (context.globalAlpha != 0) {
+					// 		
+					// 		context.fillRect(i*9-(camera.x%9),j*9-(camera.y%9),9,9);
+					// 	}
+					// }
+					// context.globalAlpha = 1;
 					// if (x == 0 && j == 0) {
 					// 	// console.log("whats takin so long");
 					// 	context.rect(i*9-camera.x,0,0,800);
@@ -308,6 +310,39 @@
 					// }
 				}
 			}
+
+
+
+			// reference chunk
+			// context.fillStyle = "#FFFFFF";
+			// var rc = ""+(1+parseInt(camera.x/99))+","+(1+parseInt(camera.y/99));
+			// context.fillRect((99-camera.x%99)+parseInt(camera.x/99),(99-camera.x%99)+parseInt(camera.x/99),99,99);
+			// context.stroke();
+
+
+
+
+
+				// RIP SHADOW DATA
+			// draw shadow
+			// var shadow_data = context.createImageData(100,100);
+			// for (var i = 0; i < shadow_data.data.length; i+=4) {
+			// 	shadow_data[i] = 0;
+			// 	shadow_data[i+1] = 0;
+			// 	shadow_data[i+2] = 0;
+			// 	shadow_data[i+3] = 1;
+			// }
+
+
+			// for (var x = 0; x < 900; x++) {
+			// 	for (var y = 0; y < 900; y++) {
+			// 		if (level.lighting[x+camera.x][y+camera.y] != 0) {
+			// 			// context.globalAlpha = 1-(level.lighting[x+camera.x][y+camera.y]*0.01);
+			// 			// context.rect(x,y,1,1);
+			// 		}
+			// 	}
+			// }
+
 			// context.stroke();
 			// for (var i = camera.slice_index; i < camera.slice_index+10; i++) {
 			// 	for (var j = camera.chunk_index; j < camera.chunk_index+10; j++) {
@@ -328,7 +363,15 @@
 			// context.rect(ix-player.width/4,iy-player.height/2,player.width/2,0);
 			// context.rect(ix-player.width/4,iy+player.height/2,player.width/2,0);
 			// context.stroke();
-			context.drawImage(player.img,ix,iy,player.width,player.height);
+			
+			if (player.face == 'r') {
+				context.drawImage(player.img,ix,iy,player.width,player.height);
+			} else if (player.face == 'l') {
+				context.drawImage(player.img,ix,iy,player.width,player.height);
+			} else {
+				throw "ya gotta have a face";
+			}
+
 			for (var i = 0; i < enemies.length; i++) {
 				context.drawImage(enemies[i].img,(enemies[i].coordinates.x-enemies[i].width/2)-camera.x,(enemies[i].coordinates.y-enemies[i].height/2)-camera.y,enemies[i].width,enemies[i].height);
 			}
@@ -348,6 +391,22 @@
 			}
 
 			
+
+
+			// lighting code
+			context.fillStyle = "#000000";
+			for (var i = parseInt(camera.x/9); i < level.slices.length*11; i++) {
+				for (var j = parseInt(camera.y/9); j < level.slices[0].chunks.length*11; j++) {
+					if (level.lighting[i][j] != 100) {
+						context.globalAlpha = 1-(0.01*level.lighting[i][j]);
+						context.fillRect((i-parseInt(camera.x/9))*9-(9-camera.x%9),(j-parseInt(camera.y/9))*9-(9-camera.y%9),9,9);
+					}
+				}
+			}
+			context.globalAlpha = 1;
+
+
+
 
 
 			context.fillStyle = "#000000";

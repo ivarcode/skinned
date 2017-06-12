@@ -8,7 +8,7 @@ function Level(s,c) {
 	for (var i = 0; i < s; i++) {
 		this.slices[i] = new Slice(c);
 	}
-	// set_lighting(this);
+	this.lighting = get_dark_array(this.slices.length*11,this.slices[0].chunks.length*11);
 	this.items = [];
 }
 
@@ -19,6 +19,30 @@ function add_noise(arr,severity) {
 			arr[i] = arr[i]+(parseInt(Math.random()*severity*2)-severity);
 		}
 	}
+}
+
+function get_dark_array(x,y) {
+	var a = []
+	for (var i = 0; i < x; i++) {
+		var b = [];
+		for (var j = 0; j < x; j++) {
+			b.push(0);
+		}
+		a.push(b);
+	}
+	return a;
+}
+
+function print_lighting(lighting) {
+	var c = "";
+	for (var i = 0; i < lighting.length; i++) {
+		for (var j = 0; j < lighting[0].length; j++) {
+			if (lighting[i][j] != 0) {
+				c += lighting[i][j];
+			}
+		}
+	}
+	console.log("lighting != 0   ::   "+c);
 }
 
 
@@ -81,68 +105,54 @@ function edit_data(level,x,y,id) {
 }
 
 function set_light_level(level,x,y,light_level) {
-	level.slices[parseInt(x/11)].chunks[parseInt(y/11)].data[y%11][x%11].light_level = light_level;
+	level.lighting[x][y] = light_level;
 }
 
 function set_lighting(level) {
 	// sets the light levels of the data in level
 	console.log("set_lighting start");
-	var bool = false;
-	for (var x = 0; x < level.slices.length*11; x++) {
-		for (var y = 0; y < level.slices[0].chunks.length*11; y++) {
-			// console.log(get_data(level,x,y).id);
-			if (get_data(level,x,y).id == 0) {
-				if (y != 0) {
-					if (Number.isFinite(get_data(level,x,y-1).light_level)) {
-						set_light_level(level,x,y,get_data(level,x,y-1).light_level-1);
-					} else {
-						set_light_level(level,x,y,Infinity);
-					}
-				} else {
-					set_light_level(level,x,y,Infinity);
-				}
-			} else {
-				bool = true;
-				if (y != 0) {
-					if (Number.isFinite(get_data(level,x,y-1).light_level)) {
-						set_light_level(level,x,y,get_data(level,x,y-1).light_level/2);
-					} else {
-						set_light_level(level,x,y,10);
-					}
-				} else {
-					set_light_level(level,x,y,Infinity);
-				}
-			}
-		}
-	}
+	// SUN
+	
+	// ITEMS
 	for (var i = 0; i < level.items.length; i++) {
 		if (level.items[i].light_level == null) {
 			// if no light emitted from, do nothing
 		} else {
 			console.log("meme");
-			set_light_radius(level,level.items[i].coordinates.x,level.items[i].coordinates.y,100,level.items[i].light_level);
+			set_light_radius(level,
+					parseInt(level.items[i].coordinates.x/9),
+					parseInt(level.items[i].coordinates.y/9),
+					level.items[i].light_level,
+					level.items[i].light_level
+				);
 		}
 	}
-	console.log(bool);
 	console.log("set_lighting end");
 
 }
 
 function set_light_radius(level,x,y,radius,light_level) {
-	for (var xx = x; xx < x+(radius*2); xx++) {
-		for (var yy = y; yy < y+(radius*2); yy++) {
-			if ((xx*xx)+(yy*yy) <= radius*radius) {
-				set_light_level(level,xx,yy,light_level);
+	console.log("set_light_radius(",level,x,y,radius,light_level);
+	for (var xx = x-radius; xx < x+radius; xx++) {
+		for (var yy = y-radius; yy < y+radius; yy++) {
+			var meme = (Math.pow(Math.abs(x-xx),2)+Math.pow(Math.abs(y-yy),2));
+			if (meme < Math.pow(radius,2)) {
+				set_light_level(level,xx,yy,light_level-parseInt(Math.sqrt(meme)));
+				// set_light_level(level,xx,yy,light_level-3*parseInt((parseInt(Math.sqrt(meme))/3)));
 			}
 		}
 	}
-}
 
 
-function set_lighting_to(level,override_value) {
-	for (x = 0; x < level.slices.length*11; x++) {
-		for (y = 0; y < level.slices[0].chunks.length*11; y++) {
-			set_light_level(level,x,y,override_value);
-		}
-	}
+
+
+	// for (var xx = x; xx < x+(radius*2); xx++) {
+	// 	for (var yy = y; yy < y+(radius*2); yy++) {
+	// 		if ((xx*xx)+(yy*yy) <= radius*radius) {
+	// 			console.log("ayuydfasdf");
+	// 			set_light_level(level,xx,yy,light_level);
+	// 		}
+	// 	}
+	// }
 }
+
