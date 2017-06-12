@@ -10,6 +10,7 @@ function Entity(coord,speed,hp,height,width,img,type) {
 	this.height = height;
 	this.width = width;
 	this.img = img;
+	this.state = "standing";
 	this.type = type;
 	this.momentum_vertical = 0;
 	this.momentum_horizontal = 0;

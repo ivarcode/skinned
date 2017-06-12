@@ -29,5 +29,5 @@ IMG.torch.src = "./img/items/torch.jpg";
 
 /*getters*/
 function get_torch() {
-	return new Item("torch",{x:null,y:null},IMG.torch,20,10,80);
+	return new Item("torch",{x:null,y:null},IMG.torch,20,10,100);
 }

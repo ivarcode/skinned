@@ -73,6 +73,15 @@
 		CHAR._player.src = "./img/player.png";
 		CHAR._enemy.src = "./img/enemy.png";
 
+		/*animations*/
+		var player_running_animation = [];
+		player_running_animation.push(new Image());
+		player_running_animation[0].src = "./img/player_running/0.png"
+		player_running_animation.push(new Image());
+		player_running_animation[1].src = "./img/player_running/1.png"
+		player_running_animation.push(new Image());
+		player_running_animation[2].src = "./img/player_running/2.png"
+
 		var player = new Entity({x:1300,y:2000},10,100,150,50,CHAR._player,"player");
 		var enemies = [];
 		enemies.push(new Entity({x:1200,y:2000},10,100,120,50,CHAR._enemy,"enemy"));
@@ -367,7 +376,11 @@
 			if (player.face == 'r') {
 				context.drawImage(player.img,ix,iy,player.width,player.height);
 			} else if (player.face == 'l') {
+				context.translate(player.width,0);
+				context.scale(-1,1);
 				context.drawImage(player.img,ix,iy,player.width,player.height);
+				context.translate(-player.width,0);
+				context.scale(1,1);
 			} else {
 				throw "ya gotta have a face";
 			}
@@ -554,6 +567,21 @@
 				// 	// player.momentum_horizontal = -player.get_speed();
 				// 	// do nothing
 				// }
+
+				if (player.state == "standing") {
+					player.img = player_running_animation[0];
+					player.state = "run_0";
+				} else if (player.state == "run_0") {
+					player.img = player_running_animation[1];
+					player.state = "run_1";
+				} else if (player.state == "run_1") {
+					player.img = player_running_animation[2];
+					player.state = "run_2";
+				} else if (player.state == "run_2") {
+					player.img = player_running_animation[0];
+					player.state = "run_0";
+				}
+
 			} else {
 				player.momentum_horizontal = parseInt(player.momentum_horizontal/2);
 			}
@@ -565,6 +593,19 @@
 				// if (player.momentum_horizontal < player.get_speed()) {
 				// 	player.momentum_horizontal += 1;
 				// }
+				if (player.state == "standing") {
+					player.img = player_running_animation[0];
+					player.state = "run_0";
+				} else if (player.state == "run_0") {
+					player.img = player_running_animation[1];
+					player.state = "run_1";
+				} else if (player.state == "run_1") {
+					player.img = player_running_animation[2];
+					player.state = "run_2";
+				} else if (player.state == "run_2") {
+					player.img = player_running_animation[0];
+					player.state = "run_0";
+				}
 			} else {
 				player.momentum_horizontal = parseInt(player.momentum_horizontal/2);
 			}
