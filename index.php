@@ -50,6 +50,9 @@
 			_CLOCK:null,
 			_TOTAL_GAME_TIME_PAUSED:0,
 			_PAUSE_CLOCK:null,
+			_SHOW_HUD:true,
+			_SHOW_INV:false,
+			_MS_PER_TICK:null,
 			_PAUSED:false/*game currently in dev so this var can change based on whether i want the game to start right away or wait for me to press 'p'*/
 		};
 		var KEY_DATA = {
@@ -58,6 +61,8 @@
 			_s_IS_PRESSED:false,
 			_d_IS_PRESSED:false,
 			_p_IS_PRESSED:false,
+			_h_IS_PRESSED:false,
+			_e_IS_PRESSED:false,
 			_space_IS_PRESSED:false
 		};
 
@@ -76,13 +81,31 @@
 		/*animations*/
 		var player_running_animation = [];
 		player_running_animation.push(new Image());
-		player_running_animation[0].src = "./img/player_running/0.png"
+		player_running_animation[0].src = "./img/player_running/0.png";
 		player_running_animation.push(new Image());
-		player_running_animation[1].src = "./img/player_running/1.png"
+		player_running_animation[1].src = "./img/player_running/1.png";
 		player_running_animation.push(new Image());
-		player_running_animation[2].src = "./img/player_running/2.png"
+		player_running_animation[2].src = "./img/player_running/2.png";
+		player_running_animation.push(new Image());
+		player_running_animation[3].src = "./img/player_running/3.png";
+		player_running_animation.push(new Image());
+		player_running_animation[4].src = "./img/player_running/4.png";
+		player_running_animation.push(new Image());
+		player_running_animation[5].src = "./img/player_running/5.png";
+		player_running_animation.push(new Image());
+		player_running_animation[6].src = "./img/player_running/6.png";
+		player_running_animation.push(new Image());
+		player_running_animation[7].src = "./img/player_running/7.png";
+		player_running_animation.push(new Image());
+		player_running_animation[8].src = "./img/player_running/8.png";
+		player_running_animation.push(new Image());
+		player_running_animation[9].src = "./img/player_running/9.png";
+		player_running_animation.push(new Image());
+		player_running_animation[10].src = "./img/player_running/10.png";
+		player_running_animation.push(new Image());
+		player_running_animation[11].src = "./img/player_running/11.png";
 
-		var player = new Entity({x:1300,y:2000},10,100,150,50,CHAR._player,"player");
+		var player = new Entity({x:1300,y:2800},10,100,180,50,CHAR._player,"player");
 		var enemies = [];
 		enemies.push(new Entity({x:1200,y:2000},10,100,120,50,CHAR._enemy,"enemy"));
 
@@ -91,8 +114,6 @@
 		var levels = [];
 		levels[0] = generate_level_gym();
 		
-		console.log(get_torch());
-		place_item_at(levels[0],get_torch(),1010,2850);
 
 		set_lighting(levels[0]);
 		// set_lighting_to(levels[0],1);
@@ -147,6 +168,18 @@
 					GAME_STATS._PAUSED = !GAME_STATS._PAUSED;
 					GAME_STATS._PAUSE_CLOCK = new Date();
 				}
+				/*KEYPRESSED == 'E'*/
+				if (keycode == 69) {
+					KEY_DATA._e_IS_PRESSED = true;
+					// show inventory
+					GAME_STATS._SHOW_INV = !GAME_STATS._SHOW_INV;
+				}
+				/*KEYPRESSED == 'H'*/
+				if (keycode == 72) {
+					KEY_DATA._h_IS_PRESSED = true;
+					// hud on/off
+					GAME_STATS._SHOW_HUD = !GAME_STATS._SHOW_HUD;
+				}
 				/*KEYPRESSED == '(space)'*/
 				if (keycode == 32) {
 					KEY_DATA._space_IS_PRESSED = true;
@@ -174,6 +207,14 @@
 				/*KEYPRESSED == 'P'*/
 				if (keycode == 80) {
 					KEY_DATA._p_IS_PRESSED = false;
+				}
+				/*KEYPRESSED == 'H'*/
+				if (keycode == 72) {
+					KEY_DATA._h_IS_PRESSED = false;
+				}
+				/*KEYPRESSED == 'E'*/
+				if (keycode == 69) {
+					KEY_DATA._e_IS_PRESSED = false;
 				}
 				/*KEYPRESSED == '(space)'*/
 				if (keycode == 32) {
@@ -363,7 +404,7 @@
 			// console.log(player.coordinates);
 			var ix = player.coordinates.x-camera.x;
 			var iy = player.coordinates.y-camera.y;
-			ix -= player.width/2;
+			ix -= player.width;
 			iy -= player.height/2;
 			// console.log(ix+" "+iy);
 			// context.rect(ix-5,iy-5,10,10);
@@ -374,13 +415,18 @@
 			// context.stroke();
 			
 			if (player.face == 'r') {
-				context.drawImage(player.img,ix,iy,player.width,player.height);
+				context.drawImage(player.img,ix,iy,player.width*2,player.height);
+				context.fillRect(player.coordinates.x-camera.x,0,1,900);
+				context.fillRect(0,player.coordinates.y-camera.y,900,1);
 			} else if (player.face == 'l') {
-				context.translate(player.width,0);
+				context.translate(900,0);
 				context.scale(-1,1);
-				context.drawImage(player.img,ix,iy,player.width,player.height);
-				context.translate(-player.width,0);
-				context.scale(1,1);
+				// console.log("draw l face player @ "+ix+","+iy);
+				context.drawImage(player.img,900-(ix+(player.width*2)),iy,player.width*2,player.height);
+				// reset to default
+				context.setTransform(1,0,0,1,0,0);
+				context.fillRect(player.coordinates.x-camera.x,0,1,900);
+				context.fillRect(0,player.coordinates.y-camera.y,900,1);
 			} else {
 				throw "ya gotta have a face";
 			}
@@ -407,35 +453,59 @@
 
 
 			// lighting code
+			
+
+			// for (var i = parseInt(camera.x/9); i < level.slices.length*11; i++) {
+			// 	for (var j = parseInt(camera.y/9); j < level.slices[0].chunks.length*11; j++) {
+			// 		if (level.lighting[i][j] != 100) {
+			// 			context.fillStyle = level.glow_color[i][j];
+			// 			context.globalAlpha = (0.003*level.lighting[i][j]);
+			// 			context.fillRect((i-parseInt(camera.x/9))*9-(9-camera.x%9),(j-parseInt(camera.y/9))*9-(9-camera.y%9),9,9);
+			// 		}
+			// 	}
+			// }
+
 			context.fillStyle = "#000000";
 			for (var i = parseInt(camera.x/9); i < level.slices.length*11; i++) {
 				for (var j = parseInt(camera.y/9); j < level.slices[0].chunks.length*11; j++) {
-					if (level.lighting[i][j] != 100) {
+					if (level.lighting[i][j] < 100) {
+						
 						context.globalAlpha = 1-(0.01*level.lighting[i][j]);
 						context.fillRect((i-parseInt(camera.x/9))*9-(9-camera.x%9),(j-parseInt(camera.y/9))*9-(9-camera.y%9),9,9);
+					} else if (level.lighting[i][j] >= 100) {
+						// context.globalAlpha = 0;
+						// context.fillRect((i-parseInt(camera.x/9))*9-(9-camera.x%9),(j-parseInt(camera.y/9))*9-(9-camera.y%9),9,9);
 					}
 				}
 			}
 			context.globalAlpha = 1;
 
 
+			// show inv
+			if (GAME_STATS._SHOW_INV) {
+				context.fillStyle = "#000000";
+				context.rect(200,200,500,200);
+				context.stroke();
+			}
 
 
-
-			context.fillStyle = "#000000";
-			context.fillText(GAME_STATS._CLOCK,730,50);
-			context.font = "20px lucida console";
-			context.fillStyle = "#FFFFFF";
-			context.fillText("camera",50,850);
-			context.fillText(camera.x+" "+camera.y,150,850);
-			context.fillText("player",50,870);
-			context.fillText(player.coordinates.x+" "+player.coordinates.y,150,870);
-			context.fillText("momentum h/v",300,870);
-			context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,470,870);
-			context.fillText(player.face,550,870);
-			context.fillText("mouse "+current_mouse_pos.x+","+current_mouse_pos.y,700,870);
-			// context.fillText(player.health_points+" HP",40+player.health_points,50);
-			
+			if (GAME_STATS._SHOW_HUD) {
+				context.fillStyle = "#000000";
+				context.fillText(GAME_STATS._CLOCK,730,50);
+				context.fillText("ms/tick : "+parseInt(GAME_STATS._MS_PER_TICK*10)/10,695,80);
+				context.font = "20px lucida console";
+				context.fillStyle = "#FFFFFF";
+				context.fillText("camera",50,850);
+				context.fillText(camera.x+" "+camera.y,150,850);
+				context.fillText("player",50,870);
+				context.fillText(player.coordinates.x+" "+player.coordinates.y,150,870);
+				context.fillText("momentum h/v",300,870);
+				context.fillText(player.momentum_horizontal+" "+player.momentum_vertical,470,870);
+				context.fillText(player.face,550,870);
+				context.fillText("mouse "+current_mouse_pos.x+","+current_mouse_pos.y,700,870);
+				// context.fillText(player.health_points+" HP",40+player.health_points,50);
+				
+			}
 		}
 		/*function responsible for drawing the menu when the game is paused*/
 		function draw_menu() {
@@ -578,6 +648,33 @@
 					player.img = player_running_animation[2];
 					player.state = "run_2";
 				} else if (player.state == "run_2") {
+					player.img = player_running_animation[3];
+					player.state = "run_3";
+				} else if (player.state == "run_3") {
+					player.img = player_running_animation[4];
+					player.state = "run_4";
+				} else if (player.state == "run_4") {
+					player.img = player_running_animation[5];
+					player.state = "run_5";
+				} else if (player.state == "run_5") {
+					player.img = player_running_animation[6];
+					player.state = "run_6";
+				} else if (player.state == "run_6") {
+					player.img = player_running_animation[7];
+					player.state = "run_7";
+				} else if (player.state == "run_7") {
+					player.img = player_running_animation[8];
+					player.state = "run_8";
+				} else if (player.state == "run_8") {
+					player.img = player_running_animation[9];
+					player.state = "run_9";
+				} else if (player.state == "run_9") {
+					player.img = player_running_animation[10];
+					player.state = "run_10";
+				} else if (player.state == "run_10") {
+					player.img = player_running_animation[11];
+					player.state = "run_11";
+				} else if (player.state == "run_11") {
 					player.img = player_running_animation[0];
 					player.state = "run_0";
 				}
@@ -603,6 +700,33 @@
 					player.img = player_running_animation[2];
 					player.state = "run_2";
 				} else if (player.state == "run_2") {
+					player.img = player_running_animation[3];
+					player.state = "run_3";
+				} else if (player.state == "run_3") {
+					player.img = player_running_animation[4];
+					player.state = "run_4";
+				} else if (player.state == "run_4") {
+					player.img = player_running_animation[5];
+					player.state = "run_5";
+				} else if (player.state == "run_5") {
+					player.img = player_running_animation[6];
+					player.state = "run_6";
+				} else if (player.state == "run_6") {
+					player.img = player_running_animation[7];
+					player.state = "run_7";
+				} else if (player.state == "run_7") {
+					player.img = player_running_animation[8];
+					player.state = "run_8";
+				} else if (player.state == "run_8") {
+					player.img = player_running_animation[9];
+					player.state = "run_9";
+				} else if (player.state == "run_9") {
+					player.img = player_running_animation[10];
+					player.state = "run_10";
+				} else if (player.state == "run_10") {
+					player.img = player_running_animation[11];
+					player.state = "run_11";
+				} else if (player.state == "run_11") {
 					player.img = player_running_animation[0];
 					player.state = "run_0";
 				}
@@ -614,6 +738,12 @@
 					player.momentum_vertical = 15;
 				}
 			}
+
+			if (!KEY_DATA._d_IS_PRESSED && !KEY_DATA._a_IS_PRESSED) {
+				player.state = "standing";
+				player.img = CHAR._player;
+			}
+
 			// apply gravity
 			gravity(player);
 
@@ -691,6 +821,7 @@
 				c += 86400000;
 			}
 			c -= GAME_STATS._TOTAL_GAME_TIME_PAUSED;
+			GAME_STATS._TOTAL_MS = c;
 			// parsing the data to display by h, m, s, and ms
 			var h = parseInt(c/3600000);
 			var m = parseInt((c%3600000)/60000);
@@ -730,7 +861,13 @@
 			setTimeout(tick,GAME_STATS._SPEED);
 			// console.log(GAME_STATS._CLOCK);
 
+			if (GAME_STATS._MS_PER_TICK == null) {
+				GAME_STATS._TOTAL_TICKS = 0;
+			}
+
 			if (!GAME_STATS._PAUSED) {
+				GAME_STATS._TOTAL_TICKS++;
+				GAME_STATS._MS_PER_TICK = GAME_STATS._TOTAL_MS/GAME_STATS._TOTAL_TICKS;
 				TEST_CODE();
 				set_camera();
 				enemy_ai();

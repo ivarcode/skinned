@@ -2,13 +2,14 @@
 item.js
 */
 
-function Item(name,coordinates,img,height,width,light_level) {
+function Item(name,coordinates,img,height,width,light_level,glow_style) {
 	this.name = name;
 	this.coordinates = coordinates;
 	this.img = img;
 	this.height = height;
 	this.width = width;
 	this.light_level = light_level;
+	this.glow_style = glow_style;
 }
 
 function place_item_at(level,item,x,y) {
@@ -29,5 +30,5 @@ IMG.torch.src = "./img/items/torch.jpg";
 
 /*getters*/
 function get_torch() {
-	return new Item("torch",{x:null,y:null},IMG.torch,20,10,100);
+	return new Item("torch",{x:null,y:null},IMG.torch,20,10,100,"yellow");
 }

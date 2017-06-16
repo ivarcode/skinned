@@ -9,6 +9,7 @@ function Level(s,c) {
 		this.slices[i] = new Slice(c);
 	}
 	this.lighting = get_dark_array(this.slices.length*11,this.slices[0].chunks.length*11);
+	this.glow_color = get_black_array(this.slices.length*11,this.slices[0].chunks.length*11);
 	this.items = [];
 }
 
@@ -27,6 +28,18 @@ function get_dark_array(x,y) {
 		var b = [];
 		for (var j = 0; j < x; j++) {
 			b.push(0);
+		}
+		a.push(b);
+	}
+	return a;
+}
+
+function get_black_array(x,y) {
+	var a = []
+	for (var i = 0; i < x; i++) {
+		var b = [];
+		for (var j = 0; j < x; j++) {
+			b.push(null);
 		}
 		a.push(b);
 	}
@@ -87,6 +100,9 @@ function generate_level_gym() {
 			}
 		}
 	}
+	place_item_at(level,get_torch(),1000,2500);
+	place_item_at(level,get_torch(),2000,2500);
+	place_item_at(level,get_torch(),3000,2500);
 	return level;
 }
 
@@ -105,7 +121,9 @@ function edit_data(level,x,y,id) {
 }
 
 function set_light_level(level,x,y,light_level) {
-	level.lighting[x][y] = light_level;
+	// if (light_level > level.lighting[x][y]) {
+		level.lighting[x][y]+=light_level;
+	// }
 }
 
 function set_lighting(level) {
@@ -119,11 +137,12 @@ function set_lighting(level) {
 			// if no light emitted from, do nothing
 		} else {
 			console.log("meme");
-			set_light_radius(level,
+				set_light_radius(level,
 					parseInt(level.items[i].coordinates.x/9),
 					parseInt(level.items[i].coordinates.y/9),
 					level.items[i].light_level,
-					level.items[i].light_level
+					level.items[i].light_level,
+					level.items[i].glow_style
 				);
 		}
 	}
@@ -131,14 +150,22 @@ function set_lighting(level) {
 
 }
 
-function set_light_radius(level,x,y,radius,light_level) {
+function set_light_radius(level,x,y,radius,light_level,glow_color) {
 	console.log("set_light_radius(",level,x,y,radius,light_level);
 	for (var xx = x-radius; xx < x+radius; xx++) {
 		for (var yy = y-radius; yy < y+radius; yy++) {
-			var meme = (Math.pow(Math.abs(x-xx),2)+Math.pow(Math.abs(y-yy),2));
-			if (meme < Math.pow(radius,2)) {
-				set_light_level(level,xx,yy,light_level-parseInt(Math.sqrt(meme)));
-				// set_light_level(level,xx,yy,light_level-3*parseInt((parseInt(Math.sqrt(meme))/3)));
+			if (xx < 0 || yy < 0 || xx > level.slices.length*11 || yy > level.slices[0].chunks.length*11) {
+				// nope
+			} else {
+				var meme = (Math.pow(Math.abs(x-xx),2)+Math.pow(Math.abs(y-yy),2));
+				if (meme < Math.pow(radius,2)) {
+					// console.log(level,xx,yy,light_level);
+					set_light_level(level,xx,yy,light_level-parseInt(Math.sqrt(meme)));
+					// set_light_level(level,xx,yy,light_level-3*parseInt((parseInt(Math.sqrt(meme))/3)));
+					if (glow_color != null) {
+						level.glow_color[xx][yy] = glow_color;
+					}
+				}
 			}
 		}
 	}

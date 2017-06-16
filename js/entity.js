@@ -17,6 +17,8 @@ function Entity(coord,speed,hp,height,width,img,type) {
 	this.current_action = null;
 	this.current_item = null;
 	this.face = 'r';
+	this.inv = [];
+	this.current_item = null;
 }
 
 /*Entity prototype functions*/
